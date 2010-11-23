@@ -1,0 +1,258 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		698ECF6F1261C7670026A6FF /* calc.c in Sources */ = {isa = PBXBuildFile; fileRef = 698ECF601261C7670026A6FF /* calc.c */; };
+		698ECF701261C7670026A6FF /* control.c in Sources */ = {isa = PBXBuildFile; fileRef = 698ECF611261C7670026A6FF /* control.c */; };
+		698ECF711261C7670026A6FF /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 698ECF621261C7670026A6FF /* error.c */; };
+		698ECF721261C7670026A6FF /* eval.c in Sources */ = {isa = PBXBuildFile; fileRef = 698ECF631261C7670026A6FF /* eval.c */; };
+		698ECF731261C7670026A6FF /* fun.c in Sources */ = {isa = PBXBuildFile; fileRef = 698ECF641261C7670026A6FF /* fun.c */; };
+		698ECF741261C7670026A6FF /* gbc.c in Sources */ = {isa = PBXBuildFile; fileRef = 698ECF651261C7670026A6FF /* gbc.c */; };
+		698ECF751261C7670026A6FF /* inisubr.c in Sources */ = {isa = PBXBuildFile; fileRef = 698ECF661261C7670026A6FF /* inisubr.c */; };
+		698ECF761261C7670026A6FF /* iofunc.c in Sources */ = {isa = PBXBuildFile; fileRef = 698ECF671261C7670026A6FF /* iofunc.c */; };
+		698ECF771261C7670026A6FF /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 698ECF681261C7670026A6FF /* main.c */; };
+		698ECF781261C7670026A6FF /* print.c in Sources */ = {isa = PBXBuildFile; fileRef = 698ECF691261C7670026A6FF /* print.c */; };
+		698ECF791261C7670026A6FF /* read.c in Sources */ = {isa = PBXBuildFile; fileRef = 698ECF6A1261C7670026A6FF /* read.c */; };
+		8DD76FB00486AB0100D96B5E /* MyLispIntepreter.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6A0FF2C0290799A04C91782 /* MyLispIntepreter.1 */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8DD76FAF0486AB0100D96B5E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				8DD76FB00486AB0100D96B5E /* MyLispIntepreter.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		698ECF601261C7670026A6FF /* calc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = calc.c; sourceTree = "<group>"; };
+		698ECF611261C7670026A6FF /* control.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = control.c; sourceTree = "<group>"; };
+		698ECF621261C7670026A6FF /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = error.c; sourceTree = "<group>"; };
+		698ECF631261C7670026A6FF /* eval.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = eval.c; sourceTree = "<group>"; };
+		698ECF641261C7670026A6FF /* fun.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fun.c; sourceTree = "<group>"; };
+		698ECF651261C7670026A6FF /* gbc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gbc.c; sourceTree = "<group>"; };
+		698ECF661261C7670026A6FF /* inisubr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = inisubr.c; sourceTree = "<group>"; };
+		698ECF671261C7670026A6FF /* iofunc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = iofunc.c; sourceTree = "<group>"; };
+		698ECF681261C7670026A6FF /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		698ECF691261C7670026A6FF /* print.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = print.c; sourceTree = "<group>"; };
+		698ECF6A1261C7670026A6FF /* read.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read.c; sourceTree = "<group>"; };
+		698ECF6B1261C7670026A6FF /* defvar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defvar.h; sourceTree = "<group>"; };
+		698ECF6C1261C7670026A6FF /* error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = error.h; sourceTree = "<group>"; };
+		698ECF6D1261C7670026A6FF /* lisp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lisp.h; sourceTree = "<group>"; };
+		698ECF6E1261C7670026A6FF /* var.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = var.h; sourceTree = "<group>"; };
+		8DD76FB20486AB0100D96B5E /* MyLispIntepreter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MyLispIntepreter; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6A0FF2C0290799A04C91782 /* MyLispIntepreter.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = MyLispIntepreter.1; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8DD76FAD0486AB0100D96B5E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* MyLispIntepreter */ = {
+			isa = PBXGroup;
+			children = (
+				08FB7795FE84155DC02AAC07 /* Source */,
+				C6A0FF2B0290797F04C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = MyLispIntepreter;
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				698ECF601261C7670026A6FF /* calc.c */,
+				698ECF611261C7670026A6FF /* control.c */,
+				698ECF621261C7670026A6FF /* error.c */,
+				698ECF631261C7670026A6FF /* eval.c */,
+				698ECF641261C7670026A6FF /* fun.c */,
+				698ECF651261C7670026A6FF /* gbc.c */,
+				698ECF661261C7670026A6FF /* inisubr.c */,
+				698ECF671261C7670026A6FF /* iofunc.c */,
+				698ECF681261C7670026A6FF /* main.c */,
+				698ECF691261C7670026A6FF /* print.c */,
+				698ECF6A1261C7670026A6FF /* read.c */,
+				698ECF6B1261C7670026A6FF /* defvar.h */,
+				698ECF6C1261C7670026A6FF /* error.h */,
+				698ECF6D1261C7670026A6FF /* lisp.h */,
+				698ECF6E1261C7670026A6FF /* var.h */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8DD76FB20486AB0100D96B5E /* MyLispIntepreter */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C6A0FF2B0290797F04C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				C6A0FF2C0290799A04C91782 /* MyLispIntepreter.1 */,
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8DD76FA90486AB0100D96B5E /* MyLispIntepreter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "MyLispIntepreter" */;
+			buildPhases = (
+				8DD76FAB0486AB0100D96B5E /* Sources */,
+				8DD76FAD0486AB0100D96B5E /* Frameworks */,
+				8DD76FAF0486AB0100D96B5E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MyLispIntepreter;
+			productInstallPath = "$(HOME)/bin";
+			productName = MyLispIntepreter;
+			productReference = 8DD76FB20486AB0100D96B5E /* MyLispIntepreter */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "MyLispIntepreter" */;
+			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 08FB7794FE84155DC02AAC07 /* MyLispIntepreter */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8DD76FA90486AB0100D96B5E /* MyLispIntepreter */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8DD76FAB0486AB0100D96B5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				698ECF6F1261C7670026A6FF /* calc.c in Sources */,
+				698ECF701261C7670026A6FF /* control.c in Sources */,
+				698ECF711261C7670026A6FF /* error.c in Sources */,
+				698ECF721261C7670026A6FF /* eval.c in Sources */,
+				698ECF731261C7670026A6FF /* fun.c in Sources */,
+				698ECF741261C7670026A6FF /* gbc.c in Sources */,
+				698ECF751261C7670026A6FF /* inisubr.c in Sources */,
+				698ECF761261C7670026A6FF /* iofunc.c in Sources */,
+				698ECF771261C7670026A6FF /* main.c in Sources */,
+				698ECF781261C7670026A6FF /* print.c in Sources */,
+				698ECF791261C7670026A6FF /* read.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB928608733DD80010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = MyLispIntepreter;
+			};
+			name = Debug;
+		};
+		1DEB928708733DD80010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = MyLispIntepreter;
+			};
+			name = Release;
+		};
+		1DEB928A08733DD80010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		1DEB928B08733DD80010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "MyLispIntepreter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB928608733DD80010E9CD /* Debug */,
+				1DEB928708733DD80010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "MyLispIntepreter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB928A08733DD80010E9CD /* Debug */,
+				1DEB928B08733DD80010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}
