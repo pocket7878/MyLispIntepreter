@@ -126,27 +126,36 @@ static CELLP apply(CELLP func, CELLP args, CELLP env)
 
 static CELLP evallist(CELLP args, CELLP env)
 {
+     int q;
      CELLP cp1, newcell(), eval();
      //引き数のリストがcellでない場合はおそらくnilなのでnilを返却する
      if(args->id != _CELL) {
 	  return (CELLP)nil;
      }
      stackcheck;
+     //GCを呼ぶ可能性のあるコードの前で保護する
+     q = on(args);
+     on(env);
      //stackに新しいcellを用意する
      *++sp = newcell(); ec;
      //現在のスタックポインタを一旦保存しておく
      cp1 = *sp;
      //保存したcellのcarに引き数の一つ目を評価した物を入れる
+     on(cp1); //CP1を追加保護
      cp1->car = eval(args->car, env); ec;
+     off(q);
      //次の引き数に移る
      args = args->cdr;
      //引き数がcell型である限り、処理を進める
      while(args->id == _CELL) {
+	  q = on(args);
+	  on(cp1);
 	  //保存したcellのcdrに新しいcellを確保する
 	  cp1->cdr = newcell(); ec;
 	  //保存したcellのcdrに評価結果を入れる
 	  cp1 = cp1->cdr;
 	  cp1->car = eval(args->car, env); ec;
+	  off(q);
 	  args = args->cdr;
      }
      //これを抜けた辞典でスタックにはすべての引き数の評価結果が入っているそしてnilでしめる。
