@@ -26,6 +26,7 @@ print_s(CELLP cp, int mode) {
 }
 
 pri_atom(CELLP cp, int mode) {
+//fprintf(cur_fpo, "[%p]", cp);
 	switch(cp->id) {
 		case _FIX:
 			fprintf(cur_fpo, "%ld", ((NUMP)cp)->value.fix);

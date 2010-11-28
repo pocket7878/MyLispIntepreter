@@ -7,8 +7,16 @@ static CELLP atomvalue(ATOMP ap, CELLP env);
 
 CELLP eval(CELLP form, CELLP env)
 {
+static int e = 0;
+static char tabs[100];
 	CELLP cp, apply(), atomvalue(), evallist();
 	ATOMP func;
+	tabs[e] = '\t';
+	tabs[++e] = '\0';
+	printf("\n%s%d: form=", tabs, e);
+	print_s(form, ESCON);
+	printf(", env=");
+	print_s(env, ESCON);
 
 	switch(form->id) {
 		case _ATOM:
@@ -16,6 +24,9 @@ CELLP eval(CELLP form, CELLP env)
 			break;
 		case _FIX:
 		case _FLT:
+			printf("\n%s%d: result=(NUM)", tabs, e);
+			print_s(form);
+			tabs[--e] = '\0';
 			return form;
 		case _CELL:
 			stackcheck;
@@ -34,13 +45,21 @@ CELLP eval(CELLP form, CELLP env)
 			sp--;
 			break;
 		default:
+printf("\n%s%d: result=EORROR", tabs, e);
+tabs[--e] = '\0';
 			error(ULO);
 
 	}
 	if(err == ERR) {
 		pri_err(form);
+printf("\n%s%d: result=EORROR", tabs, e);
+tabs[--e] = '\0';
 		return NULL;
 	}
+printf("\n%s%d: result=", tabs, e);
+print_s(cp, ESCON);
+tabs[--e] = '\0';
+if(e == 0) printf("\n");
 	return cp;
 }
 

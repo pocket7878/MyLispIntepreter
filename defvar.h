@@ -6,9 +6,15 @@ ATOMP	t, nil, lambda, eofread, prompt;
 CELLP oblist[TABLESIZ];
 
 CELLP fromcelltop, tocelltop, freecell,freecelltop;
+CELLP old_freecell,old_freecelltop;
+
 ATOMP fromatomtop, toatomtop, freeatom,freeatomtop;
+ATOMP old_freeatom,old_freeatomtop;
+
 NUMP  fromnumtop, tonumtop, freenum,freenumtop;
+NUMP  old_freenum,old_freenumtop;
 STR   fromstrtop, tostrtop, newstr,freestrtop;
+STR   old_freestr, old_freestrtop;
 
 uchar oneline[LINESIZ];
 STR	txtp;

@@ -10,7 +10,7 @@
 
 #include "lisp.h"
 
-static STR err_msg[];
+extern STR err_msg[];
 CELLP error(int code);
 void pri_err(CELLP form);
 

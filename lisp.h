@@ -7,38 +7,41 @@ typedef unsigned char uchar;
 typedef uchar *STR;
 
 typedef struct cell {
-	char id;
-	char cpflag;
-	//コピー先へのポインター
-	struct cell *forwarding;
-	struct cell *car;
-	struct cell *cdr;
+  char id;
+  unsigned int age;
+  char cpflag;
+  //コピー先へのポインター
+  struct cell *forwarding;
+  struct cell *car;
+  struct cell *cdr;
 } CELL;
 
 typedef CELL *CELLP;
 
 typedef struct atom {
-	char id;
-	char cpflag;
-	CELLP forwarding;
-	CELLP value;
-	CELLP plist;
-	STR name;
-	char ftype;
-	CELLP fptr;
+  char id;
+  unsigned int age;
+  char cpflag;
+  CELLP forwarding;
+  CELLP value;
+  CELLP plist;
+  STR name;
+  char ftype;
+  CELLP fptr;
 } ATOM;
 
 typedef ATOM *ATOMP;
 
 typedef struct num {
-	char id;
-	char cpflag;
-	CELLP forwarding;
-	union body {
-		struct num *ptr;
-		long fix;
-		double flt;
-	} value;
+  char id;
+  unsigned int age;
+  char cpflag;
+  CELLP forwarding;
+  union body {
+    struct num *ptr;
+    long fix;
+    double flt;
+  } value;
 } NUM;
 
 typedef NUM *NUMP;

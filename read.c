@@ -188,6 +188,7 @@ static ATOMP mk_sub(STR nam)
 	CELLP error();
 
 	if(freestrtop + length > fromstrtop + (STRSIZ / 2)) {
+fprintf(stderr, "mk_sub call gbc ...");
 		gbc(OFF, ON);
 		if(freestrtop + length > fromstrtop + (STRSIZ / 2)) {
 			return (ATOMP)error(STRUP);
