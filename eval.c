@@ -191,12 +191,14 @@ CELLP bind(CELLP keys, CELLP values, CELLP env)
 
 static CELLP push(CELLP keys, CELLP value, CELLP env)
 {
+     int q = on(env);
      CELLP newcell();
      stackcheck;
      *++sp = newcell(); ec;
      (*sp)->cdr = env;
      env = *sp;
      env->car = newcell(); ec;
+     off(q);
      env->car->car = keys;
      env->car->cdr = value;
      return *sp--;
