@@ -5,6 +5,12 @@ static void initAtomArea(ATOMP from);
 static void initNumArea(NUMP from);
 static void Copying(CELLP *top, int n, int a);
 static CELLP Copy(CELLP cp, int n, int a);
+static old_mark(CELLP cp, int n);
+static rem_mark_num();
+static rem_mark_atom();
+static col_cell();
+static col_num();
+static col_atom();
 void gbc(int n, int a);
 int on(CELLP* p);
 void off(int i);
@@ -289,3 +295,170 @@ CELLP promote(CELLP cp) {
   }
   return cp->forwarding;
 }
+
+static mark(CELLP cp, int n) {
+	char c = cp->id;
+	CELLP error();
+	//旧世代領域でない物も対象外
+	if(!(ISOLDCELLP(cp) || ISOLDATOMP(cp) || ISOLDNUMP(cp))) {
+	     return;
+	}
+	//nilもノータッチ
+	if(cp == (CELLP)nil) {
+		return;
+	}
+	//既に処理済みの物も対象外
+	if(c & USED) {
+		return;
+	}
+	switch(c) {
+		case _ATOM: 
+			cp->id |= USED;
+			mark(((ATOMP)cp)->value, n);
+			mark(((ATOMP)cp)->plist, n);
+			if(!((((ATOMP)cp)->ftype) & NONMRK)) {
+				mark(((ATOMP)cp)->fptr, n);
+			}
+			break;
+		case _CELL: 
+			cp->id |= USED;
+			mark(cp->car, n);
+			mark(cp->cdr, n);
+			break;
+		case _FIX:
+		case _FLT:
+			if(n) {
+				cp->id |= USED;
+			}
+			break;
+		default:
+			return (int)error(ULO);
+	}
+}
+
+static rem_mark_num()
+	NUMP np;
+	for(np = old_freenumtop; np < old_freenumtop + NUMSIZ; ++np) {
+		np->id &= FREE;
+	}
+}
+
+static rem_mark_atom()
+	ATOMP ap;
+	for(ap = old_freeatomtop; ap < old_freeatomtop + ATOMSIZ; ++ap) {
+		ap->id = _ATOM;
+	}
+}
+
+static col_cell() 
+{
+	int n = 1;
+	CELLP end, cp = old_freecelltop;
+	while(cp->id & USED) {
+		cp->id &= FREE;
+		if(++cp >= old_freecelltop + CELLSIZ) {
+			rem_mark_num();
+			rem_mark_atom();
+			return (int)error(CELLUP);
+		}
+	}
+	old_freecell = end = cp++;
+	end->car = (CELLP)nil;
+	for(; cp < old_freecelltop + CELLSIZ; ++cp) {
+		if(cp->id & USED) {
+			cp-> &= FREE;
+			continue;
+		}
+		end->cdr = cp;
+		end = cp;
+		end->car = (CELLP)nil;
+		++n;
+	}
+	end->cdr = (CELLP)nil;
+	return n;
+}
+
+static col_num() {
+	int n = 1;
+	NUMP end, np = old_freenumtop;
+	forever {
+		if(!(np->id & USED)) {
+			break;
+		}
+		np->id &=FREE;
+		if(++np >= numtop + NUMSIZ) {
+			rem_mark_atom();
+			return (int)error(NUMUP);
+		}
+	}
+	old_freenum = end = np++;
+	end->id = _FIX;
+	for(; np < old_freenumtop + NUMSIZ; ++np) {
+		if(np->id & USED) {
+			np->id &= FREE;
+			continue;
+		}
+		end->value.ptr = np;
+		end = np;
+		end->id = _FIX;
+		++n;
+	}
+	end->value.ptr = (NUMP)nil;
+	return n;
+}
+
+static col_atom() {
+	int n = 1;
+	ATOMP end, ap = old_freeatomtop;
+	forever {
+		if(!(ap->id & USED)) {
+			break;
+		}
+		ap->id &= FREE;
+		if(++ap >= old_freeatomtop + ATOMSIZ) {
+			return (int)error(ATOMUP);
+		}
+	}
+	old_freeatom = end = ap++;
+	for(; ap < old_freeatomtop + ATOMSIZ; ++ap) {
+		if(ap->id & USED) {
+			ap->id &= FREE;
+			continue;
+		}
+		end->plist = (CELLP)ap;
+		end = ap;
+		++n;
+	}
+	end->plist = (CELLP)nil;
+	return n;
+}
+
+static col_str()
+{
+	STR s, end;
+	ATOMP ap;
+	*newstr = '\0';
+	for(s = end = strtop + strlen("nil")+1; s < newstr;) {
+		for(ap = atomtop + 1; ap < atomtop + ATOMSIZ; ++ap) {
+			if(!(ap->id & USED)) {
+				continue;
+			}
+			if(ap->name == s) {
+				if(end != s) {
+					strcpy(end, s);
+					ap->name = end;
+				}
+				while(*end++ != '\0');
+				break;
+			}
+		}
+		while(*s++ != '\0');
+		while(*s == '\0' && s < newstr) {
+			++s;
+		}
+	}
+	newstr = end;
+	return (int)((strtop + STRSIZ) - newstr);
+}
+
+     
