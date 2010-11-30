@@ -16,6 +16,9 @@ extern NUMP old_freenum,old_freenumtop;
 extern STR fromstrtop, tostrtop, newstr,freestrtop;
 extern STR old_newstr,old_freestrtop;
 
+extern CELLP* cellpp[999];
+extern int cellpptop;
+
 extern uchar oneline[LINESIZ];
 extern STR txtp;
 extern int err, err_no;

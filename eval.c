@@ -149,7 +149,7 @@ static CELLP evallist(CELLP args, CELLP env)
      //引き数がcell型である限り、処理を進める
      while(args->id == _CELL) {
 	  q = on(args);
-	  on(cp1);
+	  on(env);
 	  //保存したcellのcdrに新しいcellを確保する
 	  cp1->cdr = newcell(); ec;
 	  //保存したcellのcdrに評価結果を入れる
@@ -191,14 +191,13 @@ CELLP bind(CELLP keys, CELLP values, CELLP env)
 
 static CELLP push(CELLP keys, CELLP value, CELLP env)
 {
-     int q = on(env);
+     int q;
      CELLP newcell();
      stackcheck;
      *++sp = newcell(); ec;
      (*sp)->cdr = env;
      env = *sp;
      env->car = newcell(); ec;
-     off(q);
      env->car->car = keys;
      env->car->cdr = value;
      return *sp--;
@@ -217,3 +216,4 @@ static CELLP atomvalue(ATOMP ap, CELLP env)
      }
      return ap->value;
 }
+

@@ -10,8 +10,7 @@ int on(CELLP* p);
 void off(int i);
 void gc_aux(int n, int a);
 
-CELLP* cellpp[999];
-int cellpptop = 0;
+cellpptop = 0;
 
 // 登録
 int on(CELLP* p)

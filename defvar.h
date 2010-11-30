@@ -16,6 +16,9 @@ NUMP  old_freenum,old_freenumtop;
 STR   fromstrtop, tostrtop, newstr,freestrtop;
 STR   old_freestr, old_freestrtop;
 
+CELLP* cellpp[999];
+int cellpptop;
+
 uchar oneline[LINESIZ];
 STR	txtp;
 
