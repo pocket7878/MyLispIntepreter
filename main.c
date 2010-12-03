@@ -185,6 +185,13 @@ void refreshCellArea(CELLP from, CELLP to)
 	  cp->cdr = (CELLP)nil;
      }
      (--cp)->cdr = (CELLP)nil;
+     for(cp = old_freecelltop; cp < old_freecelltop + CELLSIZ; ++cp) {
+	  cp->id = _CELL;
+	  cp->car = (CELLP)nil;
+	  cp->cdr = (CELLP)nil;
+     }
+     //最後尾をnilにする
+     (--cp)->cdr = (CELLP)nil;
 }
 
 void refreshAtomArea(ATOMP from, ATOMP to)
@@ -204,6 +211,12 @@ void refreshAtomArea(ATOMP from, ATOMP to)
      }
      //最後尾をnilにする
      (--ap)->plist = (CELLP)nil;
+     //旧世代領域も初期か
+     for(ap = old_freeatomtop; ap < old_freeatomtop + ATOMSIZ; ++ap) {
+	  ap->id = _ATOM;
+	  ap->plist = (CELLP)nil;
+     }
+     (--ap)->plist = (CELLP)nil;
 }
 
 void refreshNumArea(NUMP from, NUMP to)
@@ -222,6 +235,11 @@ void refreshNumArea(NUMP from, NUMP to)
      }	
      //最後尾をnilにする
      (--np)->value.ptr = (NUMP)nil;
+     for(np = old_freenumtop; np < old_freenumtop + NUMSIZ; ++np) {
+	  np->id = _FIX;
+	  np->value.ptr = (CELLP)nil;
+     }
+     (--np)->value.ptr = (CELLP)nil;
 }	
 	
 static mk_nil()

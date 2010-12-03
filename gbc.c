@@ -297,10 +297,10 @@ CELLP promote(CELLP cp) {
      char c = cp->id;
      switch(c) {
      case _ATOM:
-	  if(old_freeatomtop == (CELLP)nil) {
+	  if((old_freeatomtop + 1) > old_freeatom + ATOMSIZ) {
 	       //もし旧世代領域がいっぱいだったら
 	       old_gbc(OFF,ON);
-	       if(old_freeatomtop == (CELLP)nil) {
+	       if((old_freeatomtop + 1) > old_freeatom + ATOMSIZ) {
 		    fprintf(stdout,"Allocation failed!!!!!!\n");
 		    exit(0);
 	       }
@@ -309,9 +309,9 @@ CELLP promote(CELLP cp) {
 	  old_freeatomtop++;
 	  break;
      case _CELL:
-	  if(old_freecelltop == (CELLP)nil) {
+	  if((old_freecelltop + 1) > old_freecell + CELLSIZ) {
 	       old_gbc(OFF,ON);
-	       if(old_freecelltop == (CELLP)nil) {
+	       if((old_freecelltop + 1) > old_freecell + CELLSIZ) {
 		    fprintf(stdout,"Allocation failed!!!!!!\n");
 		    exit(0);
 	       }
@@ -322,9 +322,9 @@ CELLP promote(CELLP cp) {
      case _FIX:
 	  //FALL THROUT
      case _FLT:
-	  if(old_freenumtop == (CELLP)nil) {
+	  if((old_freenumtop + 1) > old_freenum + CELLSIZ) {
 	       old_gbc(ON,OFF);
-	       if(old_freenumtop == (CELLP)nil) {
+	       if((old_freenumtop + 1) > old_freenum + CELLSIZ) {
 		    fprintf(stdout,"Allocation failed!!!!!!\n");
 		    exit(0);
 	       }
