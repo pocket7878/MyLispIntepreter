@@ -1,4 +1,5 @@
 #include "lisp.h"
+#include "save.h"
 #include <ctype.h>
 #define forever for(;;)
 static STR getstr();
@@ -256,7 +257,9 @@ static CELLP mk_list(int level)
 			getcdr(cp1, UNDER); ec;
 			break;
 		}
+		int q = on(&cp1);
 		cp2 = newcell(); ec;
+		off(q);
 		cp1->cdr = cp2;
 		getcar(cp2, UNDER); ec;
 		cp1 = cp2;
@@ -413,7 +416,7 @@ intern(ATOMP ap)
 {
 	int i = 0;
 	CELLP cp, newcell();
-
+	
 	cp = newcell(); ec;
 	i = hash(ap->name);
 	cp->car = (CELLP)ap;

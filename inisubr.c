@@ -1,4 +1,5 @@
 #include "lisp.h"
+#include "save.h"
 
 static init0();
 static init1();

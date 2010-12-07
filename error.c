@@ -7,6 +7,7 @@
  */
 
 #include "lisp.h"
+#include "save.h"
 
 static STR err_msg[] = {
 	"I don't know what happend",

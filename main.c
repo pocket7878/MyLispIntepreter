@@ -1,6 +1,7 @@
 #include <signal.h>
 #define MAIN
 #include "lisp.h"
+#include "save.h"
 #define forever for(;;)
 
 static reset_err();
@@ -30,16 +31,19 @@ void main()
      }
 }
 
-toplevel_f()
+int toplevel_f()
 {
      int i;
      CELLP *argp1, *argp2;
      CELLP read_s(), eval(), error();
      //argp1はstacktop+1になる。
      argp1 = ++sp;
+     int q = on(argp1);
      stackcheck;
      //argp2はstacktop+1になる
      argp2 = ++sp;
+     on(argp2);
+     on(sp);
      forever {
 	  //S式を読み込み
 	  *argp1 = read_s(TOP);
@@ -47,7 +51,10 @@ toplevel_f()
 	  ec;
 	  //評価して
 	  *argp2 = (CELLP)nil;
+	  on(argp1);
+	  on(argp2);
 	  *argp2 = eval(*argp1, *argp2);
+	  off(q);
 	  //エラーが有れば出力し、復帰する
 	  switch(err) {
 	  case ERROK:
@@ -68,6 +75,7 @@ toplevel_f()
 	  /*   } */
 	  fputc('\n', cur_fpo);
      }
+     off(q);
      //sp(stack pointer)を元の位置に戻す
      sp -= 2;
 }
@@ -174,6 +182,7 @@ void refreshCellArea(CELLP from, CELLP to)
      //Cellの連結リストを作成
      for(cp = fromcelltop; cp < fromcelltop + (CELLSIZ / 2); ++cp) {
 	  cp->id = _CELL;
+	  cp->forwarding = (CELLP)nil;
 	  cp->car = (CELLP)nil;
 	  cp->cdr = (CELLP)nil;
      }
@@ -181,12 +190,14 @@ void refreshCellArea(CELLP from, CELLP to)
      (--cp)->cdr = (CELLP)nil;
      for(cp = tocelltop; cp < tocelltop + (CELLSIZ / 2); ++cp) {
 	  cp->id = _CELL;
+	  cp->forwarding = (CELLP)nil;
 	  cp->car = (CELLP)nil;
 	  cp->cdr = (CELLP)nil;
      }
      (--cp)->cdr = (CELLP)nil;
      for(cp = old_freecelltop; cp < old_freecelltop + CELLSIZ; ++cp) {
 	  cp->id = _CELL;
+	  cp->forwarding = (CELLP)nil;
 	  cp->car = (CELLP)nil;
 	  cp->cdr = (CELLP)nil;
      }
@@ -201,12 +212,14 @@ void refreshAtomArea(ATOMP from, ATOMP to)
      //nilはcar,cdrともに自分自身を指し示すのでatomの先頭にあるnilは無視する(よって+1から始める)
      for(ap = fromatomtop; ap < fromatomtop + (ATOMSIZ / 2); ++ap) {
 	  ap->id = _ATOM;
+	  ap->forwarding = (CELLP)nil;
 	  ap->plist = (CELLP)nil;
      }
      //最後尾をnilにする
      (--ap)->plist = (CELLP)nil;
      for(ap = toatomtop; ap < toatomtop + (ATOMSIZ / 2); ++ap) {
 	  ap->id = _ATOM;
+	  ap->forwarding = (CELLP)nil;
 	  ap->plist = (CELLP)nil;
      }
      //最後尾をnilにする
@@ -214,6 +227,7 @@ void refreshAtomArea(ATOMP from, ATOMP to)
      //旧世代領域も初期か
      for(ap = old_freeatomtop; ap < old_freeatomtop + ATOMSIZ; ++ap) {
 	  ap->id = _ATOM;
+	  ap->forwarding = (CELLP)nil;
 	  ap->plist = (CELLP)nil;
      }
      (--ap)->plist = (CELLP)nil;
@@ -225,18 +239,21 @@ void refreshNumArea(NUMP from, NUMP to)
      //numの連結リストを作成
      for(np = fromnumtop; np < fromnumtop + (NUMSIZ / 2); ++np) {
 	  np->id = _FIX;
+	  np->forwarding = (NUMP)nil;
 	  np->value.ptr = (NUMP)nil;
      }
      //最後尾をnilにする
      (--np)->value.ptr = (NUMP)nil;
      for(np = tonumtop; np < tonumtop + (NUMSIZ / 2); ++np) {
 	  np->id = _FIX;
+	  np->forwarding = (NUMP)nil;
 	  np->value.ptr = (NUMP)nil;
      }	
      //最後尾をnilにする
      (--np)->value.ptr = (NUMP)nil;
      for(np = old_freenumtop; np < old_freenumtop + NUMSIZ; ++np) {
 	  np->id = _FIX;
+	  np->forwarding = (NUMP)nil;
 	  np->value.ptr = (CELLP)nil;
      }
      (--np)->value.ptr = (CELLP)nil;

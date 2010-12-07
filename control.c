@@ -1,4 +1,5 @@
 #include "lisp.h"
+#include "save.h"
 #include "error.h"
 
 CELLP cond_f(CELLP clauses, CELLP env) 
@@ -11,14 +12,21 @@ CELLP cond_f(CELLP clauses, CELLP env)
 		if(clauses->car->id != _CELL) {
 			return (CELLP)error(CCL);
 		}
+		int q = on(&env);
+		on(&clauses);
 		key = eval(clauses->car->car, env); ec;
+		off(q);
 		if(key != (CELLP)nil) {
 			if((bodies = clauses->car->cdr)->id != _CELL) {
 				return key;
 			}
 			while(bodies->id == _CELL) {
-				result = eval(bodies->car, env); ec;
-				bodies = bodies->cdr;
+			     q = on(&env);
+			     on(&clauses);
+			     on(&bodies);
+			     result = eval(bodies->car, env); ec;
+			     off(q);
+			     bodies = bodies->cdr;
 			}
 			return result;
 		}
@@ -50,14 +58,19 @@ CELLP setq_f(CELLP args, CELLP env)
 			return (CELLP)error(NEA);
 		}
 		var = (ATOMP)args->car;
+		int q = on(&args);
+		on(&env);
 		val = eval(args->cdr->car, env); ec;
+		off(q);
 		if(var->id != _ATOM) {
 			return (CELLP)error(IAA);
 		}
 		if(var == nil || var == t || var == eofread) {
 			return (CELLP)error(CCC);
 		}
+		q = on(&env);
 		result = setenv(var, val, env); ec;
+		off(q);
 		if(result == NULL) {
 			var->value = val;
 		}
@@ -85,7 +98,10 @@ CELLP de_f(CELLP args, CELLP env) {
 		return (CELLP)error(IAA);
 	}
 
+	int q = on(&args);
+	on(&env);
 	val = cons((CELLP)lambda, args->cdr); ec;
+	off(q);
 	func->ftype = _EXPR;
 	func->fptr  = val;
 	return (CELLP)func;
@@ -100,6 +116,7 @@ CELLP oblist_f() {
 	for(i = 0; i < TABLESIZ; ++i) {
 		if((cp2 = oblist[i]) != (CELLP)nil) break;
 	}
+	int q = on(&cp1);
 	for(; cp2->cdr != (CELLP)nil; cp2 = cp2->cdr) {
 		cp1->car = cp2->car;
 		cp3 = newcell(); ec;
@@ -115,6 +132,7 @@ CELLP oblist_f() {
 			cp1->car = cp2->car;
 		}
 	}
+	off(q);
 	return *sp--;
 }
 

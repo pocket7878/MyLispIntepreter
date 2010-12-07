@@ -1,16 +1,17 @@
 #include "lisp.h"
+#include "save.h"
 #define forever for(;;)
 
 CELLP car_f(CELLP args)
 {
 	if(args->id != _CELL) {
-		return error(NEA);
+	     return (CELLP)error(NEA);
 	}
 	if(args->car == (CELLP)nil) {
 		return (CELLP)nil;
 	}
 	if(args->car->id != _CELL) {
-		return error(IAL);
+	     return (CELLP)error(IAL);
 	}
 	return args->car->car;
 }
@@ -18,13 +19,13 @@ CELLP car_f(CELLP args)
 CELLP cdr_f(CELLP args) 
 {
 	if(args->id != _CELL) {
-		return error(NEA);
+	     return (CELLP)error(NEA);
 	}
 	if(args->car == (CELLP)nil) {
 		return (CELLP)nil;
 	}
 	if(args->car->id != _CELL) {
-		return error(IAL);
+	     return (CELLP)error(IAL);
 	}
 	return args->car->cdr;
 }
@@ -33,16 +34,21 @@ CELLP cons_f(CELLP args)
 {
 	CELLP cp, cons();
 	if(args->id != _CELL || args->cdr->id != _CELL) {
-		return error(NEA);
+	     return (CELLP)error(NEA);
 	}
+	int q = on(&args);
 	cp = cons(args->car, args->cdr->car); ec;
+	off(q);
 	return cp;
 }
 
 CELLP cons(CELLP arg1, CELLP arg2) 
 {
 	CELLP cp;
+	int q = on(&arg1);
+	on(&arg2);
 	cp = newcell(); ec;
+	off(q);
 	cp->car = arg1;
 	cp->cdr = arg2;
 	return cp;
@@ -51,7 +57,7 @@ CELLP cons(CELLP arg1, CELLP arg2)
 CELLP eq_f(CELLP args)
 {
 	if(args->id != _CELL || args->cdr->id != _CELL) {
-		return error(NEA);
+	     return (CELLP)error(NEA);
 	}
 	if(args->car == args->cdr->car) {
 		return (CELLP)t;
@@ -62,7 +68,7 @@ CELLP eq_f(CELLP args)
 CELLP atom_f(CELLP args)
 {
 	if(args->id != _CELL) {
-		return error(NEA);
+	     return (CELLP)error(NEA);
 	}
 	if(args->car->id != _CELL) {
 		return (CELLP)t;
@@ -75,7 +81,7 @@ CELLP equal_f(CELLP args)
 	int equal();
 
 	if(args->id != _CELL || args->cdr->id != _CELL) {
-		return error(NEA);
+	     return (CELLP)error(NEA);
 	}
 	while(args->cdr->id == _CELL) {
 		if(!equal(args->car, args->cdr->car)) {
@@ -136,11 +142,11 @@ CELLP putprop_f(CELLP args)
 	if(args->id != _CELL
 		|| args->cdr->id != _CELL
 		|| args->cdr->cdr->id != _CELL) {
-		return error(NEA);
+	     return (CELLP)error(NEA);
 	}
 	if((ap = (ATOMP)args->car)->id != _ATOM
 		|| (key  = (ATOMP)args->cdr->cdr->car)->id != _ATOM) {
-		return error(IAA);
+	     return (CELLP)error(IAA);
 	}
 	val = args->cdr->car;
 	cp = ap->plist;
@@ -150,10 +156,13 @@ CELLP putprop_f(CELLP args)
 		}
 	}
 	stackcheck;
+	int q = on(&args);
 	*++sp = newcell(); ec;
 	cp = *sp;
+	on(&cp);
 	cp->car = (CELLP)key;
 	cp->cdr = newcell(); ec;
+	off(q);
 	cp->cdr->car = val;
 	cp->cdr->cdr = ap->plist;
 	ap->plist = *sp--;
@@ -166,11 +175,11 @@ CELLP get_f(CELLP args)
 	ATOMP key,ap;
 
 	if(args->id != _CELL || args->cdr->id != _CELL) {
-		return error(NEA);
+	     return (CELLP)error(NEA);
 	}
 	if((ap = (ATOMP)args->car)->id != _ATOM ||
 				(key = (ATOMP)args->cdr->car)->id != _ATOM) {
-		return error(IAA);
+	     return (CELLP)error(IAA);
 	}
 	for(cp = ap->plist; cp->id == _CELL; cp = cp->cdr->cdr) {
 		if((ATOMP)cp->car == key) {
@@ -187,11 +196,11 @@ CELLP remprop_f(CELLP args)
 	ATOMP key, ap;
 
 	if(args->id != _CELL || args->cdr->id != _CELL) {
-		return error(NEA);
+	     return (CELLP)error(NEA);
 	}
 	if((ap = (ATOMP)args->car)->id != _ATOM ||
 			(key = (ATOMP)args->cdr->car)->id != _ATOM) {
-		return error(IAA);
+	     return (CELLP)error(IAA);
 	}
 	if((cp = ap->plist) == (CELLP)nil) {
 		return (CELLP)nil;

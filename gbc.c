@@ -1,49 +1,26 @@
 #include "lisp.h"
+#include "save.h"
 #define forever for(;;)
-static void initCellArea(CELLP from);
-static void initAtomArea(ATOMP from);
-static void initNumArea(NUMP from);
-static void Copying(CELLP *top, int n, int a);
-static CELLP Copy(CELLP cp, int n, int a);
-static CELLP promote(CELLP cp);
-static mark(CELLP cp, int n);
-static rem_mark_num();
-static rem_mark_atom();
-static col_cell();
-static col_num();
-static col_atom();
-static col_str();
+void initCellArea(CELLP from);
+void initAtomArea(ATOMP from);
+void initNumArea(NUMP from);
+void Copying(CELLP *top, int n, int a);
+CELLP Copy(CELLP cp, int n, int a);
+CELLP promote(CELLP cp);
+void mark(CELLP cp, int n);
+void rem_mark_num();
+void rem_mark_atom();
+int col_cell();
+int col_num();
+int col_atom();
+int col_str();
 void gbc(int n, int a);
-static void old_gbc(int n, int a);
-int on(CELLP* p);
-void off(int i);
-void gc_aux(int n, int a);
+void old_gbc(int n, int a);
 
 int verbose = 1;
 int syoushinn = 3;
 
 cellpptop = 0;
-
-// 登録
-int on(CELLP* p)
-{
-  cellpp [cellpptop] = p;
-  return cellpptop ++;
-}
-// 登録解除
-void off(int i)
-{
-  cellpptop = i;
-}
-
-void gc_aux(int n, int a)
-{
-  int i;
-  for(i = 0; i < cellpptop; i++)
-    {
-      Copying(cellpp[i], n, a);
-    }
-}
 
 #define ISCELLP(x) (fromcelltop <= (x) && (x) < fromcelltop + (CELLSIZ / 2))
 #define ISATOMP(x) (fromatomtop <= (x) && (x) < fromatomtop + (ATOMSIZ / 2))
@@ -128,10 +105,11 @@ void gbc(int n, int a) {
     freeatomtop = toatomtop;
   }
 	
-	
+  printf("Copying oblist start**\n");
   for(i = 0; i < TABLESIZ; ++i) {
     Copying(&oblist[i], n, a);
   }
+  printf("Copying stack start**\n");
   for(sp1 = stacktop + 1; sp1 <= sp; ++sp1) {
     Copying(sp1, n, a);
   }
@@ -157,7 +135,7 @@ void gbc(int n, int a) {
   }
 }
 
-static void initCellArea(CELLP from)
+void initCellArea(CELLP from)
 {
   CELLP cp;
   printf("** Init Cell Area Start **\n");
@@ -171,7 +149,7 @@ static void initCellArea(CELLP from)
 }
 
 
-static void initAtomArea(ATOMP from)
+void initAtomArea(ATOMP from)
 {
   ATOMP ap;
   //atomの連結リストを作成
@@ -186,7 +164,7 @@ static void initAtomArea(ATOMP from)
   (--ap)->plist = (CELLP)nil;
 }
 
-static void initNumArea(NUMP from)
+void initNumArea(NUMP from)
 {
   NUMP np;
   //numの連結リストを作成
@@ -199,14 +177,14 @@ static void initNumArea(NUMP from)
   (--np)->value.ptr = (NUMP)nil;
 }
 	
-static void Copying(CELLP *top, int n, int a)
+void Copying(CELLP *top, int n, int a)
 {
   //n = ONの時はnumもCopyする,
   //a = ONの時はatom,strもCopyする
   *top = Copy(*top, n, a);
 }
 
-static CELLP Copy(CELLP cp, int n, int a)
+CELLP Copy(CELLP cp, int n, int a)
 {
   //旧世代領域に居るやつは無視する
   if(ISOLDCELLP(cp) || ISOLDATOMP(cp) || ISOLDNUMP(cp)) {
@@ -336,7 +314,7 @@ CELLP promote(CELLP cp) {
      return cp;
 }
 
-static old_gbc(int n, int a) {
+void old_gbc(int n, int a) {
      int i, s;
      CELLP *sp1;
      if(verbose) {
@@ -376,7 +354,7 @@ static old_gbc(int n, int a) {
      }
 }
 
-static mark(CELLP cp, int n) {
+void mark(CELLP cp, int n) {
 	char c = cp->id;
 	//旧世代領域でない物も対象外
 	if(!(ISOLDCELLP(cp) || ISOLDATOMP(cp) || ISOLDNUMP(cp))) {
@@ -415,21 +393,21 @@ static mark(CELLP cp, int n) {
 	}
 }
 
-static rem_mark_num() {
+void rem_mark_num() {
 	NUMP np;
 	for(np = old_freenumtop; np < old_freenumtop + NUMSIZ; ++np) {
 		np->id &= FREE;
 	}
 }
 
-static rem_mark_atom() {
+void rem_mark_atom() {
 	ATOMP ap;
 	for(ap = old_freeatomtop; ap < old_freeatomtop + ATOMSIZ; ++ap) {
 		ap->id = _ATOM;
 	}
 }
 
-static col_cell() 
+int col_cell() 
 {
 	int n = 1;
 	CELLP end, cp = old_freecelltop;
@@ -457,7 +435,7 @@ static col_cell()
 	return n;
 }
 
-static col_num() {
+int col_num() {
 	int n = 1;
 	NUMP end, np = old_freenumtop;
 	forever {
@@ -486,7 +464,7 @@ static col_num() {
 	return n;
 }
 
-static col_atom() {
+int col_atom() {
 	int n = 1;
 	ATOMP end, ap = old_freeatomtop;
 	forever {
@@ -512,7 +490,7 @@ static col_atom() {
 	return n;
 }
 
-static col_str()
+int col_str()
 {
 	STR s, end;
 	ATOMP ap;

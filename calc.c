@@ -1,4 +1,5 @@
 #include "lisp.h"
+#include "save.h"
 #define  forever for(;;) 
 
 CELLP get1arg(CELLP args, NUMP valp) {
@@ -19,15 +20,17 @@ CELLP get1arg(CELLP args, NUMP valp) {
 		valp->value.flt = ((NUMP)(args->car))->value.flt;
 		return args->cdr;
 	}
-	return error(IAN);
+	return (CELLP)error(IAN);
 }
 
 static CELLP setfirst(CELLP args,NUMP *npp) {
 	CELLP get1arg();
 	NUM val, *newnum();
 	//引数の一番目がvalに入ってくる、返り値はargs->cdr
+	int q = on(&args);
 	args = get1arg(args, &val); ec;
 	*npp = newnum(); ec;
+	off(q);
 	if(val.id == _FIX) {
 		(*npp)->value.fix = val.value.fix;
 	} 
@@ -51,12 +54,14 @@ CELLP minus_f(CELLP args) {
 	CELLP error();
 
 	if(args->id != _CELL) {
-		return error(NEA);
+	     return (CELLP)error(NEA);
 	}
 	if((c = args->car->id) != _FIX && c != _FLT) {
-		return error(IAN);
+	     return (CELLP)error(IAN);
 	}
+	int q = on(&args);
 	np = newnum(); ec;
+	off(q);
 	if(c == _FIX) {
 		np->value.fix = -((NUMP)(args->car))->value.fix;
 	}
@@ -71,16 +76,19 @@ CELLP plus_f(CELLP args){
 	CELLP setfirst(), get1arg();
 	NUM val;
 	NUMP np;
-
+	int q = on(&args);
 	//args->cdrとnpには最初の値がかえってくる
 	args = setfirst(args, &np); ec;
+	off(q);
 	//引数が一つの場合はその引数を返却する
 	if(args == (CELLP)nil) {
 		return (CELLP)np;
 	}
 	//引数が複数個ある場合は
 	//args->cdr, val = args->cdr->car
+	q = on(&args);
 	args = get1arg(args, &val); ec;
+	off(q);
 	//npに足していく	
 	if(np->id == _FIX) {
 		while(val.id == _FIX) {
@@ -91,7 +99,9 @@ CELLP plus_f(CELLP args){
 				return (CELLP)np;
 			}
 			//update args
+			q = on(&args);
 			args = get1arg(args, &val); ec;
+			off(q);
 		}
 		toflt(np);
 	}
@@ -107,4 +117,5 @@ CELLP plus_f(CELLP args){
 		args = get1arg(args, &val); ec;
 		toflt(&val);
 	}
+	off(q);
 }
