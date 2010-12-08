@@ -127,7 +127,7 @@ static CELLP apply(CELLP func, CELLP args, CELLP env)
 	       int q = on(&args);
 	       on(&env);
 	       on(&func);
-
+	       on(&bodies);
 	       *++sp = bind(func->cdr->car, args, env); ec;
 	       off(q);
 	       for(; bodies->id == _CELL; bodies = bodies->cdr) {
@@ -209,6 +209,7 @@ CELLP bind(CELLP keys, CELLP values, CELLP env)
      //keysががnilでなくかつ、keysがatomなら
      if(keys != (CELLP)nil && keys->id == _ATOM) {
 	  env = push(keys, values, env); ec;
+	  off(q);
 	  return env;
      }
      off(q);
