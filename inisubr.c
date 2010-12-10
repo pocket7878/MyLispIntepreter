@@ -21,6 +21,7 @@ static init0()
 	CELLP print_f(), prinl_f(), princ_f();
 	CELLP minus_f(), plus_f();
 
+	save_in_sys_atom = 1;
 	defsubr("car",	car_f,	_SUBR);
 	defsubr("cdr",	cdr_f, 	_SUBR);
 	defsubr("cons",	cons_f,	_SUBR);
@@ -43,13 +44,16 @@ static init0()
 	defsubr("princ", princ_f, _SUBR);
 	defsubr("minus", minus_f, _SUBR);
 	defsubr("plus", plus_f, _SUBR);
+	save_in_sys_atom = 0;
 }
 
 static init1()
 {
 	CELLP reclaim_f(), verbos_f();
+	save_in_sys_atom = 1;
 	defsubr("reclaim", reclaim_f, _SUBR);
 	defsubr("verbos", verbos_f, _SUBR);
+	save_in_sys_atom = 0;
 }
 
 static defsubr(STR name,CELLP (*funcp)(),char type)
