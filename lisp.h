@@ -121,6 +121,7 @@ typedef NUM *NUMP;
 #define STACKSIZ 0x0500
 #define stackcheck if(sp>=stacktop+STACKSIZ){error(STACKUP);return(NULL);}
 #define STACKUP 28
+#define SYSATOMS 30
 
 #ifdef MAIN
 #include "defvar.h"

@@ -26,4 +26,6 @@ int err, err_no;
 CELLP *stacktop, *sp;
 int verbos;
 
+ATOMP freesysatomtop, freesysatom;
+int save_in_sys_atom;
 #endif

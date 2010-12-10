@@ -27,4 +27,6 @@ extern int verbos;
 
 extern int threshold;
 
+extern ATOMP freesysatomtop, freesysatoms;
+extern int save_in_sys_atom;
 #endif

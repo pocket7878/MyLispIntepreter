@@ -3,7 +3,7 @@
 #include "lisp.h"
 #include "save.h"
 #define forever for(;;)
-
+int save_in_sys_atom = 0;
 static reset_err();
 static init();
 static mk_nil();
@@ -150,6 +150,8 @@ static init()
 	
      //nilを確保する
      nil = (ATOMP)malloc(sizeof(ATOM));
+     //予約語用の領域を確保する
+     freesysatomtop = freesysatom = (ATOMP)malloc(sizeof(ATOM) * (SYSATOMS));
      /*------------------------------領域確保完了------------------------*/
 
      //領域が確保できているかを確認
@@ -159,7 +161,7 @@ static init()
 	|| freestrtop == NULL || tostrtop == NULL 
 	|| old_freecell == NULL || old_freeatom == NULL
 	|| old_freenum == NULL || old_freestr == NULL
-	|| nil == NULL) {
+	|| nil == NULL || freesysatomtop == NULL || freesysatom == NULL) {
 	  printf("Oops! Alloc Error : Too Large Data Area.\n");
 	  printf("Please change --SIZ (defined in lisp.h).\n");
 	  exit(1);
@@ -231,6 +233,11 @@ void refreshAtomArea(ATOMP from, ATOMP to)
 	  ap->plist = (CELLP)nil;
      }
      (--ap)->plist = (CELLP)nil;
+     for(ap = freesysatomtop; ap < freesysatomtop + SYSATOMS; ++ap) {
+	  ap->id = _ATOM;
+	  ap->forwarding = (CELLP)nil;
+	  ap->plist = (CELLP)nil;
+     }
 }
 
 void refreshNumArea(NUMP from, NUMP to)
@@ -278,11 +285,13 @@ static mk_nil()
 static mk_sys_atoms()
 {
      ATOMP mk_atom();
+     save_in_sys_atom = 1;
      mk_nil();
      t = mk_atom("t");
      lambda = mk_atom("lambda");
      eofread = mk_atom("EOF");
      prompt = mk_atom("% ");
+     save_in_sys_atom = 0;
 }
 
 static greeting()

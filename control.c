@@ -60,6 +60,7 @@ CELLP setq_f(CELLP args, CELLP env)
 		var = (ATOMP)args->car;
 		int q = on(&args);
 		on(&env);
+		on((CELLP *)var);
 		val = eval(args->cdr->car, env); ec;
 		off(q);
 		if(var->id != _ATOM) {
@@ -69,6 +70,9 @@ CELLP setq_f(CELLP args, CELLP env)
 			return (CELLP)error(CCC);
 		}
 		q = on(&env);
+		on(&args);
+		on(&val);
+		on((CELLP *)var);
 		result = setenv(var, val, env); ec;
 		off(q);
 		if(result == NULL) {
@@ -100,6 +104,7 @@ CELLP de_f(CELLP args, CELLP env) {
 
 	int q = on(&args);
 	on(&env);
+	on((CELLP *)func);
 	val = cons((CELLP)lambda, args->cdr); ec;
 	off(q);
 	func->ftype = _EXPR;
@@ -117,6 +122,7 @@ CELLP oblist_f() {
 		if((cp2 = oblist[i]) != (CELLP)nil) break;
 	}
 	int q = on(&cp1);
+	on(&cp2);
 	for(; cp2->cdr != (CELLP)nil; cp2 = cp2->cdr) {
 		cp1->car = cp2->car;
 		cp3 = newcell(); ec;

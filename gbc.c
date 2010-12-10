@@ -49,6 +49,17 @@ CELLP newcell()
 
 ATOMP newatom() {
   ATOMP ap;
+  //予約語のための領域確保の場合
+  if(save_in_sys_atom == 1) {
+	fprintf(stdout, "Allocation System Atom\n");
+       if((freesysatomtop + 1) > freesysatomtop + SYSATOMS) {
+	    fprintf(stderr, "Error:: Can't generate systemAtom");
+	    exit(0);
+       }
+       ap = freesysatomtop;
+       freesysatomtop++;
+       return ap;
+  }
   //新しいATOMPを用意すると半分からはみ出る場合にはGC起動
   if((freeatomtop + 1) > fromatomtop + (ATOMSIZ / 2)) {
     fprintf(stderr, "newatom call GBC...");

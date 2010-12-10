@@ -405,7 +405,6 @@ ATOMP
 mk_atom(STR nam) 
 {
 	ATOMP ap, mk_sub();
-
 	ap = mk_sub(nam); ec;
 	intern(ap);
 	return ap;
