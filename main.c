@@ -1,7 +1,7 @@
 #include <signal.h>
 #include <stdlib.h>//N//
 #include <stdio.h>//N//
-#include <io.h>//N//
+//#include <io.h>//N//
 #include <string.h>//N//
 #define MAIN
 #include "lisp.h"
@@ -316,7 +316,7 @@ void refreshNumArea(NUMP from, NUMP to)
 	
 static void mk_nil(void)//N//
 {
-     char *strcpy();
+     //char *strcpy();
      char *s = strcpy(freestrtop, "nil");
 	
      //末尾の終端文字の分を飛ばす(strlenはNULLは含まない計算をする)

@@ -41,7 +41,7 @@ CELLP cond_f(CELLP clauses, CELLP env)
 	return (CELLP)nil;
 }
 
-static CELLP setenv(ATOMP var, CELLP val, CELLP env) {
+static CELLP setenvironment(ATOMP var, CELLP val, CELLP env) {
 	while(env->id == _CELL) {
 		if(env->car->id != _CELL) {
 			return (CELLP)error(EHA);
@@ -57,7 +57,7 @@ static CELLP setenv(ATOMP var, CELLP val, CELLP env) {
 
 CELLP setq_f(CELLP args, CELLP env)
 {
-	CELLP val, result,setenv(), eval();
+	CELLP val, result,setenvironment(), eval();
 	ATOMP var;
 	while(args->id == _CELL) {
 		int q;//N//
@@ -81,7 +81,7 @@ CELLP setq_f(CELLP args, CELLP env)
 		on(&args);
 		on(&val);
 		on((CELLP *)&var);//N//
-		result = setenv(var, val, env);//N//
+		result = setenvironment(var, val, env);//N//
 		off(q);//N//
 			ec;//N//
 		if(result == NULL) {

@@ -1,4 +1,4 @@
-#include <io.h>//N//
+//#include <io.h>//N//
 #include <stdlib.h>//N//
 #include <string.h>//N//
 #include "lisp.h"
