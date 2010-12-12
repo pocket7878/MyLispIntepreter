@@ -1,17 +1,24 @@
+#include <io.h>//N//
+#include <stdlib.h>//N//
+#include <string.h>//N//
 #include "lisp.h"
+#include "print.h"//N//
+#include "error.h"//N//
+#include "gbc.h"//N//
+#include "read.h"//N//
 #include "save.h"
 #include <ctype.h>
 #define forever for(;;)
-static STR getstr();
-static getname(STR strp);
-static ATOMP ret_atom();
-static skipspace();
+static STR getstr(void);//N//
+static void getname(STR strp);//N//
+static ATOMP ret_atom(void);//N//
+static int skipspace(void);//N//
 static CELLP escopt(int level) ;
-static NUMP mk_num();
+static NUMP mk_num(void);//N//
 static hash(STR nam) ;
 static ATOMP mk_sub(STR nam) ;
 static CELLP mk_list(int level);
-static getcar(CELLP cp, int level);
+static void getcar(CELLP cp, int level);//N//
 static getcdr(CELLP cp, int level);
 int isesc(uchar c);
 int isprkana(uchar c);
@@ -25,7 +32,7 @@ static STR getstr()
 	*(txtp = oneline) = '\0';
 	return fgets(oneline, LINESIZ, cur_fpi);
 }
-static getname(STR strp)
+static void getname(STR strp)
 {
 	int i, ifesc = OFF;
 	CELLP error();
@@ -54,7 +61,7 @@ static getname(STR strp)
 		}
 		if(*txtp == '\n' || *txtp == '\0') {
 			if(getstr() == NULL) {
-				return (int)error(EOFERR);
+				return /*(int)error(EOFERR)*/;//N//
 			}
 			--i;
 			continue;
@@ -72,13 +79,14 @@ static getname(STR strp)
 			}
 		}
 		if(!isprkana(*txtp)) {
-			return (int)error(CTRLIN);
+			return /*(int)error(CTRLIN)*/;//N//
 		}
 		*strp++ = *txtp++;
 	}
 	*strp = '\0';
 }
-static ATOMP ret_atom()
+
+static ATOMP ret_atom(void)//N//
 {
 	uchar nambuf[NAMLEN+ 1];
 	ATOMP ap, old_atom(), mk_atom();
@@ -90,7 +98,7 @@ static ATOMP ret_atom()
 	return ap;
 }
 
-static skipspace()
+static int skipspace(void)//N//
 {
 	STR getstr();
 	forever {
@@ -115,11 +123,11 @@ static CELLP escopt(int level)
 		case '(':
 		case '[':
 			return mk_list(level);
-			break;
+			//break;//N//
 		case '|':
 		case '\\':
-			return (CELLP)ret_atom(ON);
-			break;
+			return (CELLP)ret_atom(/*ON*/);//N//
+			//break;//N//
 		default:
 			return error(PSEXP);
 	}
@@ -185,9 +193,8 @@ static ATOMP mk_sub(STR nam)
 	STR tmpnam;
 	int length = strlen(nam) + 1;
 	ATOMP ap, newatom();
-	STR strcpy();
+//	STR strcpy();//N//
 	CELLP error();
-
 	if(freestrtop + length > fromstrtop + (STRSIZ / 2)) {
 fprintf(stderr, "mk_sub call gbc ...");
 		gbc(OFF, ON);
@@ -216,6 +223,7 @@ static CELLP mk_list(int level)
 	char mode;
 	CELLP cp1, cp2;
 	CELLP newcell(), error();
+	int q;//N//
 
 	if(*txtp++ == '[') {
 		mode = SUP;
@@ -241,7 +249,10 @@ static CELLP mk_list(int level)
 	}
 	stackcheck;
 	cp1 = *++sp = newcell(); ec;
-	getcar(cp1, UNDER); ec;
+	q = on(&cp1);//N//
+	getcar(cp1, UNDER);
+	off(q);//N//
+		ec;
 	if(skipspace() == NULL) {
 		error(EOFERR);
 	}
@@ -254,14 +265,22 @@ static CELLP mk_list(int level)
 			if(*txtp == ')' || *txtp == ']') {
 				return error(PSEXP);
 			}
-			getcdr(cp1, UNDER); ec;
+			q = on(&cp1);//N//
+			getcdr(cp1, UNDER);
+			off(q);//N//
+				ec;
 			break;
 		}
-		int q = on(&cp1);
-		cp2 = newcell(); ec;
-		off(q);
+		q = on(&cp1);//N//
+		cp2 = newcell();
+		off(q);//N//
+			ec;
+		q = on(&cp1);//N//
+		on(&cp2);//N//
 		cp1->cdr = cp2;
-		getcar(cp2, UNDER); ec;
+		getcar(cp2, UNDER);
+		off(q);//N//
+			ec;
 		cp1 = cp2;
 		if(skipspace() == NULL) {
 			return error(EOFERR);
@@ -276,15 +295,19 @@ static CELLP mk_list(int level)
 	return *sp--;
 }
 
-static getcar(CELLP cp, int level) {
+static void getcar(CELLP cp, int level) {//N//
 	CELLP cp1, read_s();
-	cp1 = read_s(level); ec;
+	int q = on(&cp);//N//
+	cp1 = read_s(level); //ec;//N//
+	off(q);//N//
 	cp->car = cp1;
 }
 
-static getcdr(CELLP cp, int level) {
+static int getcdr(CELLP cp, int level) {//N//
 	CELLP cp1, read_s(), error();
+	int q = on(&cp);//N//
 	cp1 = read_s(level); ec;
+	off(q);//N//
 	cp->cdr = cp1;
 	if(skipspace() == NULL) {
 		return (int)error(EOFERR);
@@ -292,6 +315,7 @@ static getcdr(CELLP cp, int level) {
 	if(*txtp != ')' && *txtp != ']') {
 		return (int)error(PSEXP);
 	}
+	return 0;
 }
 
 int num(STR x) {
@@ -299,7 +323,7 @@ int num(STR x) {
 		return TRUE;
 	}
 
-	if(*x == '-' || *x == "+") {
+	if(*x == '-' || *x == '+') {//N//
 		if(isdigit(*++x)) {
 			return TRUE;
 		}
@@ -327,7 +351,7 @@ int isesc(uchar c) {
 		default:
 			return FALSE;
 	}
-	return FALSE;
+	//return FALSE;//N//
 }
 
 int isprkana(uchar c) {
@@ -373,9 +397,9 @@ CELLP read_s(int level)
 	} else if(isesc(*txtp)) {
 		return escopt(level);
 	} else if(isprkana(*txtp)) {
-		return (CELLP)ret_atom(ON);
+		return (CELLP)ret_atom(/*ON*/);//N//
 	} else if(iskanji(*txtp)) {
-		return (CELLP)ret_atom(ON);
+		return (CELLP)ret_atom(/*ON*/);//N//
 	} else {
 		return (CELLP)error(CTRLIN);
 	}
@@ -384,7 +408,7 @@ CELLP read_s(int level)
 //既存のAtomを取り出してくる処理です。
 ATOMP old_atom(STR nam) 
 {
-	int i = 0;
+	int i/* = 0*/;//N//
 	ATOMP ap;
 	CELLP cp;
 
@@ -401,22 +425,25 @@ ATOMP old_atom(STR nam)
 	return NULL;
 }
 
-ATOMP 
-mk_atom(STR nam) 
+ATOMP mk_atom(STR nam)
 {
 	ATOMP ap, mk_sub();
+	int q;//N//
 	ap = mk_sub(nam); ec;
+	q = on((CELLP*)&ap);//N//
 	intern(ap);
+	off(q);//N//
 	return ap;
 }
 
 
-intern(ATOMP ap)
+void intern(ATOMP ap)//N
 {
-	int i = 0;
+	int i/* = 0*/;
 	CELLP cp, newcell();
-	
-	cp = newcell(); ec;
+	int q = on((CELLP*)&ap);//N//
+	cp = newcell(); //ec;//N//
+	off(q);//N//
 	i = hash(ap->name);
 	cp->car = (CELLP)ap;
 	cp->cdr = oblist[i];

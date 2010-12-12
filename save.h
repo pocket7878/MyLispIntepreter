@@ -5,4 +5,5 @@
 int on(CELLP *P);
 void off(int i);
 void gc_aux(int n, int a);
+extern int cellpptop;//N//
 #endif

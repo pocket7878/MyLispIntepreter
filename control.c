@@ -1,4 +1,9 @@
+#include <stdlib.h>//N//
 #include "lisp.h"
+#include "control.h"//N//
+#include "eval.h"//N//
+#include "fun.h"//N//
+#include "gbc.h"//N//
 #include "save.h"
 #include "error.h"
 
@@ -9,10 +14,11 @@ CELLP cond_f(CELLP clauses, CELLP env)
 		return (CELLP)error(NEA);
 	}
 	while(clauses->id == _CELL) {
+		int q;//N//
 		if(clauses->car->id != _CELL) {
 			return (CELLP)error(CCL);
 		}
-		int q = on(&env);
+		q = on(&env);//N//
 		on(&clauses);
 		key = eval(clauses->car->car, env); ec;
 		off(q);
@@ -54,15 +60,17 @@ CELLP setq_f(CELLP args, CELLP env)
 	CELLP val, result,setenv(), eval();
 	ATOMP var;
 	while(args->id == _CELL) {
+		int q;//N//
 		if(args->cdr->id != _CELL) {
 			return (CELLP)error(NEA);
 		}
 		var = (ATOMP)args->car;
-		int q = on(&args);
+		q = on(&args);//N//
 		on(&env);
-		on((CELLP *)&var);
-		val = eval(args->cdr->car, env); ec;
-		off(q);
+		on((CELLP *)&var);//N//
+		val = eval(args->cdr->car, env);//N//
+		off(q);//N//
+			ec;//N//
 		if(var->id != _ATOM) {
 			return (CELLP)error(IAA);
 		}
@@ -72,9 +80,10 @@ CELLP setq_f(CELLP args, CELLP env)
 		q = on(&env);
 		on(&args);
 		on(&val);
-		on((CELLP *)&var);
-		result = setenv(var, val, env); ec;
-		off(q);
+		on((CELLP *)&var);//N//
+		result = setenv(var, val, env);//N//
+		off(q);//N//
+			ec;//N//
 		if(result == NULL) {
 			var->value = val;
 		}
@@ -94,7 +103,7 @@ CELLP quote_f(CELLP args, CELLP env) {
 CELLP de_f(CELLP args, CELLP env) {
 	CELLP val, cons();
 	ATOMP func;
-
+	int q;//N//
 	if(args->id != _CELL || args->cdr->id != _CELL) {
 		return (CELLP)error(NEA);
 	}
@@ -102,26 +111,28 @@ CELLP de_f(CELLP args, CELLP env) {
 		return (CELLP)error(IAA);
 	}
 
-	int q = on(&args);
+	q = on(&args);//N//
 	on(&env);
-	on((CELLP *)&func);
-	val = cons((CELLP)lambda, args->cdr); ec;
-	off(q);
+	on((CELLP *)&func);//N//
+	val = cons((CELLP)lambda, args->cdr);//N//
+	off(q);//N//
+		ec;//N//
 	func->ftype = _EXPR;
 	func->fptr  = val;
 	return (CELLP)func;
 }
 
-CELLP oblist_f() {
-	int i = 0;
+CELLP oblist_f(void) {//N//
+	int i;//N//
 	CELLP cp1, cp2, cp3, newcell();
+	int q;//N//
 	stackcheck;
 
 	cp1 = *++sp = newcell(); ec;
 	for(i = 0; i < TABLESIZ; ++i) {
 		if((cp2 = oblist[i]) != (CELLP)nil) break;
 	}
-	int q = on(&cp1);
+	q = on(&cp1);//N//
 	on(&cp2);
 	for(; cp2->cdr != (CELLP)nil; cp2 = cp2->cdr) {
 		cp1->car = cp2->car;
@@ -142,11 +153,12 @@ CELLP oblist_f() {
 	return *sp--;
 }
 
-CELLP quit_f() {
+CELLP quit_f(void) {//N//
 	exit(0);
+	return 0;//N//ïKóvÇ»Ç¢Ç™åxçêÇÇ¬Ç‘Ç∑ÇΩÇﬂ
 }
 
-CELLP reclaim_f()
+CELLP reclaim_f(void)//N//
 {
 	gbc(ON, ON); ec;
 	return (CELLP)nil;

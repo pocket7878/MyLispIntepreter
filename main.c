@@ -1,17 +1,33 @@
 #include <signal.h>
+#include <stdlib.h>//N//
+#include <stdio.h>//N//
+#include <io.h>//N//
+#include <string.h>//N//
 #define MAIN
 #include "lisp.h"
+#include "error.h"//N//
+#include "read.h"//N//
+#include "print.h"//N//
+#include "fun.h"//N//
 #include "save.h"
 #define forever for(;;)
-int save_in_sys_atom = 0;
-static reset_err();
-static init();
-static mk_nil();
-static mk_sys_atoms();
-static greeting();
+//int save_in_sys_atom = 0;//N//save_in_sys_atomはdefvar.h（つまりmain.c）内で定義される
+static void reset_err(void );//N//
+static void init(void );//N//
+static void mk_nil(void );//N//
+static void mk_sys_atoms(void );//N//
+static void greeting(void );//N//
 void refreshCellArea(CELLP, CELLP);
 void refreshAtomArea(ATOMP, ATOMP);
 void refreshNumArea(NUMP, NUMP);
+int toplevel_f(void);//N//
+static void reset_err(void);//N//
+static void init(void);//N// 
+void reset_stdin(void);//N//
+void quit(void);//N//
+
+CELLP eval(CELLP form, CELLP env);//N//
+
 void main()
 {
      cur_fpo = stdout;
@@ -31,19 +47,22 @@ void main()
      }
 }
 
-int toplevel_f()
+#define ISCELLP(x) (fromcelltop <= (x) && (x) < fromcelltop + (CELLSIZ / 2))
+
+int toplevel_f(void)//N//
 {
      int i;
      CELLP *argp1, *argp2;
      CELLP read_s(), eval(), error();
+//     int q;//N//
      //argp1はstacktop+1になる。
      argp1 = ++sp;
-     int q = on(argp1);
+//     q = on(argp1);//N//
      stackcheck;
      //argp2はstacktop+1になる
      argp2 = ++sp;
-     on(argp2);
-     on(sp);
+//     on(argp2);
+//     on(sp);
      forever {
 	  //S式を読み込み
 	  *argp1 = read_s(TOP);
@@ -51,10 +70,14 @@ int toplevel_f()
 	  ec;
 	  //評価して
 	  *argp2 = (CELLP)nil;
-	  on(argp1);
-	  on(argp2);
+//	  on(argp1);
+//	  on(argp2);
+//print_s(((ATOMP)((*argp1)->car))->fptr, ESCOFF);
+print_s((*argp1)->car, ESCOFF);
+printf("[%p]",(ATOMP)((*argp1)->car));
+if(ISCELLP(((ATOMP)((*argp1)->car))->fptr)) print_s(((ATOMP)((*argp1)->car))->fptr, ESCOFF);
 	  *argp2 = eval(*argp1, *argp2);
-	  off(q);
+//	  off(q);
 	  //エラーが有れば出力し、復帰する
 	  switch(err) {
 	  case ERROK:
@@ -75,12 +98,13 @@ int toplevel_f()
 	  /*   } */
 	  fputc('\n', cur_fpo);
      }
-     off(q);
+//     off(q);
      //sp(stack pointer)を元の位置に戻す
      sp -= 2;
+     return 0;//N//
 }
 
-static reset_err()
+static void reset_err(void)//N//
 {
      cur_fpi = stdin;
      cur_fpo = stdout;
@@ -95,9 +119,9 @@ static reset_err()
      verbos = ON;
 }
 
-static init() 
+static void init(void)//N// 
 {
-     char *malloc();
+//     char *malloc();//N//#inclue <stdlib.h>をファイル先頭に加えた
      //	int quit();
      void quit();
      int i;
@@ -214,29 +238,53 @@ void refreshAtomArea(ATOMP from, ATOMP to)
      //nilはcar,cdrともに自分自身を指し示すのでatomの先頭にあるnilは無視する(よって+1から始める)
      for(ap = fromatomtop; ap < fromatomtop + (ATOMSIZ / 2); ++ap) {
 	  ap->id = _ATOM;
-	  ap->forwarding = (CELLP)nil;
+	  ap->age = 0;//N//
+	  ap->cpflag = NOTCOPIED;
+	  ap->forwarding = (CELLP)nil;//N//
+	  ap->value = (CELLP)nil;//N//
 	  ap->plist = (CELLP)nil;
+	  ap->name = "";//N//
+	  ap->ftype = 0;//N//
+	  ap->fptr = (CELLP)nil;//N//
      }
      //最後尾をnilにする
      (--ap)->plist = (CELLP)nil;
      for(ap = toatomtop; ap < toatomtop + (ATOMSIZ / 2); ++ap) {
 	  ap->id = _ATOM;
-	  ap->forwarding = (CELLP)nil;
+	  ap->age = 0;//N//
+	  ap->cpflag = NOTCOPIED;
+	  ap->forwarding = (CELLP)nil;//N//
+	  ap->value = (CELLP)nil;//N//
 	  ap->plist = (CELLP)nil;
+	  ap->name = "";//N//
+	  ap->ftype = 0;//N//
+	  ap->fptr = (CELLP)nil;//N//
      }
      //最後尾をnilにする
      (--ap)->plist = (CELLP)nil;
      //旧世代領域も初期か
      for(ap = old_freeatomtop; ap < old_freeatomtop + ATOMSIZ; ++ap) {
 	  ap->id = _ATOM;
-	  ap->forwarding = (CELLP)nil;
+	  ap->age = 0;//N//
+	  ap->cpflag = NOTCOPIED;
+	  ap->forwarding = (CELLP)nil;//N//
+	  ap->value = (CELLP)nil;//N//
 	  ap->plist = (CELLP)nil;
+	  ap->name = "";//N//
+	  ap->ftype = 0;//N//
+	  ap->fptr = (CELLP)nil;//N//
      }
      (--ap)->plist = (CELLP)nil;
      for(ap = freesysatomtop; ap < freesysatomtop + SYSATOMS; ++ap) {
 	  ap->id = _ATOM;
-	  ap->forwarding = (CELLP)nil;
+	  ap->age = 0;//N//
+	  ap->cpflag = NOTCOPIED;
+	  ap->forwarding = (CELLP)nil;//N//
+	  ap->value = (CELLP)nil;//N//
 	  ap->plist = (CELLP)nil;
+	  ap->name = "";//N//
+	  ap->ftype = 0;//N//
+	  ap->fptr = (CELLP)nil;//N//
      }
 }
 
@@ -246,27 +294,27 @@ void refreshNumArea(NUMP from, NUMP to)
      //numの連結リストを作成
      for(np = fromnumtop; np < fromnumtop + (NUMSIZ / 2); ++np) {
 	  np->id = _FIX;
-	  np->forwarding = (NUMP)nil;
+	  np->forwarding = (CELLP)nil;//N//
 	  np->value.ptr = (NUMP)nil;
      }
      //最後尾をnilにする
      (--np)->value.ptr = (NUMP)nil;
      for(np = tonumtop; np < tonumtop + (NUMSIZ / 2); ++np) {
 	  np->id = _FIX;
-	  np->forwarding = (NUMP)nil;
+	  np->forwarding = (CELLP)nil;//N//
 	  np->value.ptr = (NUMP)nil;
      }	
      //最後尾をnilにする
      (--np)->value.ptr = (NUMP)nil;
      for(np = old_freenumtop; np < old_freenumtop + NUMSIZ; ++np) {
 	  np->id = _FIX;
-	  np->forwarding = (NUMP)nil;
-	  np->value.ptr = (CELLP)nil;
+	  np->forwarding = (CELLP)nil;//N//
+	  np->value.ptr = (NUMP)nil;//N//
      }
-     (--np)->value.ptr = (CELLP)nil;
+     (--np)->value.ptr = (NUMP)nil;//N//
 }	
 	
-static mk_nil()
+static void mk_nil(void)//N//
 {
      char *strcpy();
      char *s = strcpy(freestrtop, "nil");
@@ -282,7 +330,7 @@ static mk_nil()
      intern(nil);
 }
 
-static mk_sys_atoms()
+static void mk_sys_atoms(void)
 {
      ATOMP mk_atom();
      save_in_sys_atom = 1;
@@ -294,21 +342,21 @@ static mk_sys_atoms()
      save_in_sys_atom = 0;
 }
 
-static greeting()
+static void greeting(void)//N//
 {
      fprintf(stdout,"\n");
      fprintf(stdout,"\t My Lisp Intepreter\n");
      fprintf(stdout,"\t    Developed by Pocket\n");
 }
 
-void quit() 
+void quit(void)//N//
 {
      fprintf(stdout, "\n\n\tMay the force be with you!\n");
      fprintf(stdout, "\t\t\tHappy Hacking!!\n");
      exit(0);
 }
 
-reset_stdin() 
+void reset_stdin(void)//N//
 {
      if(isatty(fileno(stdin))) {
 	  rewind(stdin);

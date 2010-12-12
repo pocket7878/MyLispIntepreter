@@ -1,4 +1,5 @@
 #include "save.h"
+void Copying(CELLP *top, int n, int a);
 
 int on(CELLP* p)
 {

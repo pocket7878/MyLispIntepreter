@@ -1,4 +1,8 @@
+#include <stdlib.h>//N//
+#include <string.h>//N//
 #include "lisp.h"
+#include "error.h"//N//
+#include "print.h"//N//
 #include "save.h"
 #define forever for(;;)
 void initCellArea(CELLP from);
@@ -8,19 +12,20 @@ void Copying(CELLP *top, int n, int a);
 CELLP Copy(CELLP cp, int n, int a);
 CELLP promote(CELLP cp);
 void mark(CELLP cp, int n);
-void rem_mark_num();
-void rem_mark_atom();
-int col_cell();
-int col_num();
-int col_atom();
-int col_str();
+void rem_mark_num(void);//N//
+void rem_mark_atom(void);//N//
+int col_cell(void);//N//
+int col_num(void);//N//
+int col_atom(void);//N//
+int col_str(void);//N//
 void gbc(int n, int a);
 void old_gbc(int n, int a);
 
 int verbose = 1;
-int syoushinn = 3;
+unsigned int syoushinn = 3;//N//
 
-cellpptop = 0;
+//cellpptop = 0;//N//cellpptopはsave.cに置いた
+
 
 #define ISCELLP(x) (fromcelltop <= (x) && (x) < fromcelltop + (CELLSIZ / 2))
 #define ISATOMP(x) (fromatomtop <= (x) && (x) < fromatomtop + (ATOMSIZ / 2))
@@ -168,8 +173,14 @@ void initAtomArea(ATOMP from)
   printf("** Init Atom Area Start **\n");
   for(ap = from + 1; ap < from + (ATOMSIZ / 2); ++ap) {
     ap->id = _ATOM;
+    ap->age = 0;//N//
     ap->cpflag = NOTCOPIED;
+    ap->forwarding = (CELLP)nil;//N//
+    ap->value = (CELLP)nil;//N//
     ap->plist = (CELLP)nil;
+    ap->name = "";//N//
+    ap->ftype = 0;//N//
+    ap->fptr = (CELLP)nil;//N//
   }
 	
   (--ap)->plist = (CELLP)nil;
@@ -198,12 +209,12 @@ void Copying(CELLP *top, int n, int a)
 CELLP Copy(CELLP cp, int n, int a)
 {
   //旧世代領域に居るやつは無視する
-  if(ISOLDCELLP(cp) || ISOLDATOMP(cp) || ISOLDNUMP(cp)) {
+  if(ISOLDCELLP(cp) || ISOLDATOMP((ATOMP)cp) || ISOLDNUMP((NUMP)cp)) {//N//
     return cp;
   }
-  char c = cp->id;
+  //char c = cp->id;//N//
   //コピー先を表すポインター
-  if(!(ISCELLP(cp) || ISATOMP(cp) || ISNUMP(cp)))	 {
+  if(!(ISCELLP(cp) || ISATOMP((ATOMP)cp) || ISNUMP((NUMP)cp))) {//N//
     return cp;			
   }
   else {
@@ -214,7 +225,8 @@ CELLP Copy(CELLP cp, int n, int a)
       return cp->forwarding;
     }
     else {
-      if(!(ISCELLP(cp) || ISATOMP(cp) || ISNUMP(cp)))
+      char c = cp->id;//N//
+      if(!(ISCELLP(cp) || ISATOMP((ATOMP)cp) || ISNUMP((NUMP)cp)))//N//
 	{
 	  fprintf(stderr, "![%p]car[%p]:", cp, cp->car);
 	  //	Copying(&(cp->car), n, a);
@@ -239,6 +251,13 @@ CELLP Copy(CELLP cp, int n, int a)
 	     //コピーした際はコピー先のアドレスを返す
 	     return cp->forwarding;
 	}
+	else//N//
+	{//N//
+printf("p[%d] ", ((ATOMP)cp)->plist);
+		Copying(&(((ATOMP)cp)->plist), n, a);//N//
+printf("f[%d] ", ((ATOMP)cp)->fptr);
+		Copying(&(((ATOMP)cp)->fptr), n, a);//N//
+	}//N//
 	return cp;
       case _CELL:
 	   if(cp->age >= syoushinn) {
@@ -265,8 +284,8 @@ CELLP Copy(CELLP cp, int n, int a)
 		return cp->forwarding;
 	   }
 	   return cp;
-      defalut:
-	return (int)error(ULO);
+      default://N//
+	return (CELLP)error(ULO);//N//
       }
     }
   }
@@ -274,16 +293,17 @@ CELLP Copy(CELLP cp, int n, int a)
 
 
 CELLP promote(CELLP cp) {
+     char c = cp->id;//N//
      //すでに旧世代領域に存在したら何もしない
-     if(ISOLDCELLP(cp) || ISOLDATOMP(cp) || ISOLDNUMP(cp)) {
+     if(ISOLDCELLP(cp) || ISOLDATOMP((ATOMP)cp) || ISOLDNUMP((NUMP)cp)) {//N//
 	  return cp;
      }
      //CELLでもATOMでもNUMでも無い物はノータッチ
-     if (!(ISCELLP(cp) || ISATOMP(cp) || ISNUMP(cp))) {
+     if (!(ISCELLP(cp) || ISATOMP((ATOMP)cp) || ISNUMP((NUMP)cp))) {//N//
 	  return cp;
      }
      //それ以外は旧世代領域にコピーしそのポインタを返す
-     char c = cp->id;
+     //char c = cp->id;
      switch(c) {
      case _ATOM:
 	  if((old_freeatomtop + 1) > old_freeatom + ATOMSIZ) {
@@ -342,13 +362,13 @@ void old_gbc(int n, int a) {
      for(sp1 = stacktop; sp1 <= sp; ++sp1) {
 	  mark(*sp1, n);
      }
-     i = col_cell(); ec;
+     i = col_cell(); //ec;//N//
      if(n) {
-	  n = col_num(); ec;
+	  n = col_num(); //ec;//N//
      }
      if(a) {
 	  s = col_str();
-	  a = col_atom(); ec;
+	  a = col_atom(); //ec;//N//
      }
      else {
 	  rem_mark_atom();
@@ -368,7 +388,7 @@ void old_gbc(int n, int a) {
 void mark(CELLP cp, int n) {
 	char c = cp->id;
 	//旧世代領域でない物も対象外
-	if(!(ISOLDCELLP(cp) || ISOLDATOMP(cp) || ISOLDNUMP(cp))) {
+	if(!(ISOLDCELLP(cp) || ISOLDATOMP((ATOMP)cp) || ISOLDNUMP((NUMP)cp))) {//N//
 	     return;
 	}
 	//nilもノータッチ
@@ -399,26 +419,26 @@ void mark(CELLP cp, int n) {
 				cp->id |= USED;
 			}
 			break;
-		default:
-			return (int)error(ULO);
+		//default://N//
+			//return (int)error(ULO);//N//
 	}
 }
 
-void rem_mark_num() {
+void rem_mark_num(void) {//N//
 	NUMP np;
 	for(np = old_freenumtop; np < old_freenumtop + NUMSIZ; ++np) {
 		np->id &= FREE;
 	}
 }
 
-void rem_mark_atom() {
+void rem_mark_atom(void) {//N//
 	ATOMP ap;
 	for(ap = old_freeatomtop; ap < old_freeatomtop + ATOMSIZ; ++ap) {
 		ap->id = _ATOM;
 	}
 }
 
-int col_cell() 
+int col_cell(void) //N//
 {
 	int n = 1;
 	CELLP end, cp = old_freecelltop;
@@ -446,7 +466,7 @@ int col_cell()
 	return n;
 }
 
-int col_num() {
+int col_num(void) {//N//
 	int n = 1;
 	NUMP end, np = old_freenumtop;
 	forever {
@@ -475,7 +495,7 @@ int col_num() {
 	return n;
 }
 
-int col_atom() {
+int col_atom(void) {//N//
 	int n = 1;
 	ATOMP end, ap = old_freeatomtop;
 	forever {
@@ -501,7 +521,7 @@ int col_atom() {
 	return n;
 }
 
-int col_str()
+int col_str(void)//N//
 {
 	STR s, end;
 	ATOMP ap;

@@ -1,4 +1,7 @@
 #include "lisp.h"
+#include "error.h"//N//
+#include "gbc.h"//N//
+#include "print.h"//N//
 #include "save.h"
 static int eval_arg_p(ATOMP func);
 static CELLP apply(CELLP func, CELLP args, CELLP env);
@@ -34,23 +37,29 @@ CELLP eval(CELLP form, CELLP env)
 	  //スタックポインタを進める
 	  ++sp;
 	  func = (ATOMP)form->car;
-	  int q = on(&form);
-	  on(&env);
-	  on(sp);
-	  if(eval_arg_p(func)) {
-	       //スタックに引き数を評価した結果を保存する(このバックグラウンドでspは--されている)
-	       *sp = evallist(form->cdr, env);
-	       off(q);
-	       if(err) break;
-	  }
-	  else {
-	       *sp = form->cdr;
-	  }
-	  printf("\nEVAL: Current *SP is ");
-	  print_s(*sp, ESCON);
-	  printf("\n");
-	  cp = apply((CELLP)func, *sp, env);
-	  off(q);
+	  {//N//
+	    int q = on(&form);
+	    on(&env);
+	    //on(sp);//N//
+	    on((CELLP*)&func);//N//
+	    if(eval_arg_p(func)) {
+	         //スタックに引き数を評価した結果を保存する(このバックグラウンドでspは--されている)
+	         *sp = evallist(form->cdr, env);
+	         //off(q);//N//
+	         if(err){//N//
+	           off(q);//N//
+	           break;//N//
+	         }//N//
+	    }
+	    else {
+	         *sp = form->cdr;
+	    }
+	    printf("\nEVAL: Current *SP is ");
+	    print_s(*sp, ESCON);
+	    printf("\n");
+	    cp = apply((CELLP)func, *sp, env);
+	    off(q);
+	  }//N//
 	  sp--;
 	  break;
      default:
@@ -86,12 +95,17 @@ static int eval_arg_p(ATOMP func)
 //function, args, environment!!
 static CELLP apply(CELLP func, CELLP args, CELLP env)
 {
-     printf("\nAPPLY: Current args: \n");
-     print_s(args, ESCON);
-     printf("\n");
+     //printf("\nAPPLY: Current args: \n");//N//
+     //print_s(args, ESCON);//N//
+     //printf("\n");//N//
      CELLP (*funcp)(), bodies, result = (CELLP)nil;
-     CELLP bind();
+     //CELLP bind();//N//
+     CELLP bind(CELLP keys, CELLP values, CELLP env);//N//
      char funtype;
+
+     printf("\nAPPLY: Current args: \n");//N//
+     print_s(args, ESCON);//N//
+     printf("\n");//N//
 
      //function check
      switch(func->id) {
@@ -104,10 +118,10 @@ static CELLP apply(CELLP func, CELLP args, CELLP env)
 	  if(funtype & _SR) {
 	       funcp = (CELLP (*)())((ATOMP)func)->fptr;
 	       if(funtype & _EA) {
-		    return (*funcp)(args);
+		    return (*(CELLP(*)(CELLP))funcp)(args);//N//
 	       }
 	       else {
-		    return (*funcp)(args, env);
+		    return (*(CELLP(*)(CELLP,CELLP))funcp)(args, env);//N//
 	       }
 	  }
 	  func = ((ATOMP)func)->fptr;
@@ -119,24 +133,27 @@ static CELLP apply(CELLP func, CELLP args, CELLP env)
 	  }
 	  //(lambda <- check!!
 	  if(func->car == (CELLP)lambda) {
+	       int q;//N//
 	       //body (lambda (x) (hoge hoge) <- body!!
 	       bodies = func->cdr->cdr;
 	       stackcheck;
 				
 	       //lambda-argsの引き数のそれぞれにargsの値をbindするよ :-)!!
-	       int q = on(&args);
+	       q = on(&args);//N//
 	       on(&env);
 	       on(&func);
 	       on(&bodies);
-	       *++sp = bind(func->cdr->car, args, env); ec;
-	       off(q);
+	       *++sp = bind(func->cdr->car, args, env);//N//
+	       off(q);//N//
+		       ec;//N//
 	       for(; bodies->id == _CELL; bodies = bodies->cdr) {
 		    q = on(&args);
 		    on(&env);
 		    on(&func);
 		    on(&bodies);
-		    result = eval(bodies->car, *sp); ec;
-		    off(q);
+		    result = eval(bodies->car, *sp);//N//
+		    off(q);//N//
+			    ec;//N//
 	       }
 	       sp--;
 	       return result;
@@ -158,16 +175,18 @@ static CELLP evallist(CELLP args, CELLP env)
      q = on(&args);
      on(&env);
      //stackに新しいcellを用意する
-     *++sp = newcell(); ec;
-     off(q);
+     *++sp = newcell();//N//
+     off(q);//N//
+	     ec;//N//
      //現在のスタックポインタを一旦保存しておく
      cp1 = *sp;
      //保存したcellのcarに引き数の一つ目を評価した物を入れる
      q = on(&cp1); //CP1を追加保護
      on(&args);
      on(&env);
-     cp1->car = eval(args->car, env); ec;
-     off(q);
+     cp1->car = eval(args->car, env);//N//
+     off(q);//N//
+	     ec;//N//
      //次の引き数に移る
      args = args->cdr;
      //引き数がcell型である限り、処理を進める
@@ -176,15 +195,17 @@ static CELLP evallist(CELLP args, CELLP env)
 	  on(&args);
 	  on(&cp1);
 	  //保存したcellのcdrに新しいcellを確保する
-	  cp1->cdr = newcell(); ec;
+	  cp1->cdr = newcell();//N//
+	  off(q);//N//
+	     ec;//N//
 	  //保存したcellのcdrに評価結果を入れる
 	  cp1 = cp1->cdr;
-	  off(q);
 	  q = on(&env);
 	  on(&args);
 	  on(&cp1);
-	  cp1->car = eval(args->car, env); ec;
-	  off(q);
+	  cp1->car = eval(args->car, env);//N//
+	  off(q);//N//
+	     ec;//N//
 	  args = args->cdr;
      }
      //これを抜けた辞典でスタックにはすべての引き数の評価結果が入っているそしてnilでしめる。
@@ -197,22 +218,27 @@ static CELLP evallist(CELLP args, CELLP env)
 CELLP bind(CELLP keys, CELLP values, CELLP env)
 {
      CELLP push();
+     int q;//N//
      printf("\nBIND: Current keys");
      print_s(keys,ESCON);
      printf("\n");
      printf("\nBIND: Current values");
      print_s(values,ESCON);
      printf("\n");
-     int q = on(&env);
-     on(&keys);
-     on(&values);
+     //q = on(&env);//N//
+     //on(&keys);//N//
+     //on(&values);//N//
      //keysががnilでなくかつ、keysがatomなら
      if(keys != (CELLP)nil && keys->id == _ATOM) {
-	  env = push(keys, values, env); ec;
-	  off(q);
+	  q = on(&env);//N//
+	  on(&keys);//N//
+	  on(&values);//N//
+	  env = push(keys, values, env);//N//
+	  off(q);//N//
+		  ec;//N//
 	  return env;
      }
-     off(q);
+     //off(q);//N//
      stackcheck;
      *++sp = env;
      while(keys->id == _CELL) {
@@ -222,8 +248,9 @@ CELLP bind(CELLP keys, CELLP values, CELLP env)
 	  q = on(&env);
 	  on(&keys);
 	  on(&values);
-	  *sp = push(keys->car, values->car, *sp); ec;
-	  off(q);
+	  *sp = push(keys->car, values->car, *sp);//N//
+	  off(q);//N//
+		  ec;//N//
 	  keys = keys->cdr;
 	  values = values->cdr;
      }
@@ -231,8 +258,9 @@ CELLP bind(CELLP keys, CELLP values, CELLP env)
 	  q = on(&env);
 	  on(&keys);
 	  on(&values);
-	  *sp = push(keys, values, *sp); ec;
-	  off(q);
+	  *sp = push(keys, values, *sp);//N//
+	  off(q);//N//
+		  ec;//N//
      }
      return *sp--;
 }
@@ -251,15 +279,17 @@ static CELLP push(CELLP keys, CELLP value, CELLP env)
      q = on(&env);
      on(&keys);
      on(&value);
-     *++sp = newcell(); ec;
-     off(q);
+     *++sp = newcell();//N//
+     off(q);//N//
+	  ec;//N//
      (*sp)->cdr = env;
      env = *sp;
      q = on(&env);
      on(&keys);
      on(&value);
-     env->car = newcell(); ec;
-     off(q);
+     env->car = newcell();//N//
+     off(q);//N//
+	  ec;//N//
      env->car->car = keys;
      env->car->cdr = value;
      return *sp--;

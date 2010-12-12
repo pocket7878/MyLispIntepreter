@@ -1,5 +1,7 @@
 #include "lisp.h"
+#include "gbc.h"//N//
 #include "save.h"
+#include "error.h"//N//
 #define  forever for(;;) 
 
 CELLP get1arg(CELLP args, NUMP valp) {
@@ -52,6 +54,7 @@ CELLP minus_f(CELLP args) {
 	char c;
 	NUMP np, newnum();
 	CELLP error();
+	int q;
 
 	if(args->id != _CELL) {
 	     return (CELLP)error(NEA);
@@ -59,7 +62,7 @@ CELLP minus_f(CELLP args) {
 	if((c = args->car->id) != _FIX && c != _FLT) {
 	     return (CELLP)error(IAN);
 	}
-	int q = on(&args);
+	q = on(&args);
 	np = newnum(); ec;
 	off(q);
 	if(c == _FIX) {
@@ -87,6 +90,7 @@ CELLP plus_f(CELLP args){
 	//引数が複数個ある場合は
 	//args->cdr, val = args->cdr->car
 	q = on(&args);
+	on((CELLP*)&np);//N//
 	args = get1arg(args, &val); ec;
 	off(q);
 	//npに足していく	
@@ -100,6 +104,7 @@ CELLP plus_f(CELLP args){
 			}
 			//update args
 			q = on(&args);
+			on((CELLP*)&np);//N//
 			args = get1arg(args, &val); ec;
 			off(q);
 		}
@@ -114,8 +119,11 @@ CELLP plus_f(CELLP args){
 		if (args == (CELLP)nil) {
 			return (CELLP)np;
 		}
+		q = on(&args);//N//
+		on((CELLP*)&np);//N//
 		args = get1arg(args, &val); ec;
+		off(q);//N//
 		toflt(&val);
 	}
-	off(q);
+//	off(q);//N//
 }

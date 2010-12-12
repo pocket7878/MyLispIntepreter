@@ -1,10 +1,14 @@
 #include "lisp.h"
+#include "error.h"//N//
+#include "print.h"
+#include "read.h"//N//
 #include "save.h"
 #include <ctype.h>
 #define forever for(;;)
 
-static putstr(int mode, STR tp);
-print_s(CELLP cp, int mode) {
+static void putstr(int mode, STR tp);//N//
+
+void print_s(CELLP cp, int mode) {
 	if(cp->id != _CELL) {
 		pri_atom(cp, mode);
 	}
@@ -26,7 +30,7 @@ print_s(CELLP cp, int mode) {
 	}
 }
 
-pri_atom(CELLP cp, int mode) {
+void pri_atom(CELLP cp, int mode) {
 //fprintf(cur_fpo, "[%p]", cp);
 	switch(cp->id) {
 		case _FIX:
@@ -43,7 +47,7 @@ pri_atom(CELLP cp, int mode) {
 	}
 }
 
-static putstr(int mode, STR tp) {
+static void putstr(int mode, STR tp) {//N//
 	if(mode == ESCOFF) {
 		fprintf(cur_fpo, "%s", tp);
 	} else if(*tp == '\0') {

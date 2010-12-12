@@ -1,4 +1,9 @@
+#include <string.h>//N//
 #include "lisp.h"
+#include "fun.h"//N//
+#include "gbc.h"//N//
+#include "read.h"//N//
+#include "error.h"//N//
 #include "save.h"
 #define forever for(;;)
 
@@ -33,10 +38,11 @@ CELLP cdr_f(CELLP args)
 CELLP cons_f(CELLP args)
 {
 	CELLP cp, cons();
+	int q;//N//
 	if(args->id != _CELL || args->cdr->id != _CELL) {
 	     return (CELLP)error(NEA);
 	}
-	int q = on(&args);
+	q = on(&args);//N//
 	cp = cons(args->car, args->cdr->car); ec;
 	off(q);
 	return cp;
@@ -138,6 +144,7 @@ CELLP putprop_f(CELLP args)
 {
 	CELLP val, cp;
 	ATOMP key,ap;
+	int q;//N//
 
 	if(args->id != _CELL
 		|| args->cdr->id != _CELL
@@ -156,10 +163,13 @@ CELLP putprop_f(CELLP args)
 		}
 	}
 	stackcheck;
-	int q = on(&args);
+	q = on(&args);//N//
+	on(&val);//N//
+	on(&cp);//N//
+	on((CELLP*)&ap);//N//
 	*++sp = newcell(); ec;
 	cp = *sp;
-	on(&cp);
+	//on(&cp);//N//
 	cp->car = (CELLP)key;
 	cp->cdr = newcell(); ec;
 	off(q);
@@ -218,14 +228,15 @@ CELLP remprop_f(CELLP args)
 	}
 	return (CELLP)nil;
 }
-static defsubr(STR name, CELLP (*funcp)(), char type)
+static void defsubr(STR name, CELLP (*funcp)(), char type)//N//
 {
 	ATOMP ap, mk_atom();
-	ap = mk_atom(name); ec;
+	ap = mk_atom(name); //ec;//N//
 	ap->ftype = type;
 	ap->fptr = (CELLP)funcp;
 }
-ini_subr() 
+
+void ini_subr()//N//
 {
 	CELLP car_f(),   cdr_f(),    cons_f();
 	CELLP atom_f(),  eq_f(),     equal_f();
@@ -235,7 +246,7 @@ ini_subr()
 	CELLP read_f(), terpri_f();
 	CELLP print_f(), prinl_f(), princ_f();
 	CELLP minus_f(), plus_f();
-	save_in_sys_atom = 1;
+
 	defsubr("car",	car_f,	_SUBR);
 	defsubr("cdr",  cdr_f,  _SUBR);
 	defsubr("cons",	cons_f,	_SUBR);
@@ -258,6 +269,5 @@ ini_subr()
 	defsubr("princ", princ_f,	_SUBR);
 	defsubr("minus", minus_f,	_SUBR);
 	defsubr("plus", plus_f,	_SUBR);
-	save_in_sys_atom = 0;
 }
 
