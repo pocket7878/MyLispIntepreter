@@ -22,9 +22,10 @@ void gbc(int n, int a);
 void old_gbc(int n, int a);
 
 int verbose = 1;
-unsigned int syoushinn = 3;//N//
+const unsigned int syoushinn = 3;//N//
+//const unsigned int syoushinn = 99999;//N//
 
-//cellpptop = 0;//N//cellpptopã¯save.cã«ç½®ã„ãŸ
+//cellpptop = 0;//N
 
 
 #define ISCELLP(x) (fromcelltop <= (x) && (x) < fromcelltop + (CELLSIZ / 2))
@@ -38,10 +39,10 @@ unsigned int syoushinn = 3;//N//
 CELLP newcell() 
 {
   CELLP cp;
-  if((freecelltop + 1) > fromcelltop + (CELLSIZ / 2)) {
+  if((freecelltop + 1) >= fromcelltop + (CELLSIZ / 2)) {
     fprintf(stderr, "newcell call GBC...");
     gbc(OFF, ON);
-    if((freecelltop + 1) > fromcelltop + (CELLSIZ / 2)) {
+    if((freecelltop + 1) >= fromcelltop + (CELLSIZ / 2)) {
       fprintf(stdout,"Allocation failed!!!!!!\n");
       exit(0);
     }
@@ -54,10 +55,10 @@ CELLP newcell()
 
 ATOMP newatom() {
   ATOMP ap;
-  //äºˆç´„èªã®ãŸã‚ã®é ˜åŸŸç¢ºä¿ã®å ´åˆ
+  //—\–ñŒê‚Ì‚½‚ß‚Ì—ÌˆæŠm•Û‚Ìê‡
   if(save_in_sys_atom == 1) {
 	fprintf(stdout, "Allocation System Atom\n");
-       if((freesysatomtop + 1) > freesysatomtop + SYSATOMS) {
+       if((freesysatomtop + 1) >= freesysatomtop + SYSATOMS) {
 	    fprintf(stderr, "Error:: Can't generate systemAtom");
 	    exit(0);
        }
@@ -65,11 +66,11 @@ ATOMP newatom() {
        freesysatomtop++;
        return ap;
   }
-  //æ–°ã—ã„ATOMPã‚’ç”¨æ„ã™ã‚‹ã¨åŠåˆ†ã‹ã‚‰ã¯ã¿å‡ºã‚‹å ´åˆã«ã¯GCèµ·å‹•
-  if((freeatomtop + 1) > fromatomtop + (ATOMSIZ / 2)) {
+  //V‚µ‚¢ATOMP‚ğ—pˆÓ‚·‚é‚Æ”¼•ª‚©‚ç‚Í‚İo‚éê‡‚É‚ÍGC‹N“®
+  if((freeatomtop + 1) >= fromatomtop + (ATOMSIZ / 2)) {
     fprintf(stderr, "newatom call GBC...");
     gbc(OFF, ON);
-    if((freeatomtop + 1) > fromatomtop + (ATOMSIZ / 2)) {
+    if((freeatomtop + 1) >= fromatomtop + (ATOMSIZ / 2)) {
       fprintf(stdout,"Allocation failed!!!!!!\n");
       exit(0);
     }
@@ -81,11 +82,11 @@ ATOMP newatom() {
 
 NUMP newnum() {
   NUMP np;
-  //æ–°ã—ã„NUMã‚’è¿½åŠ ã™ã‚‹ã¨åˆ†ã‹ã‚‰ã¯ã¿å‡ºã‚‹å ´åˆã«ã¯GCã‚’èµ·å‹•ã™ã‚‹ã€‚
-  if((freenumtop + 1) > fromnumtop + (NUMSIZ / 2)){
+  //V‚µ‚¢NUM‚ğ’Ç‰Á‚·‚é‚Æ•ª‚©‚ç‚Í‚İo‚éê‡‚É‚ÍGC‚ğ‹N“®‚·‚éB
+  if((freenumtop + 1) >= fromnumtop + (NUMSIZ / 2)){
     fprintf(stderr, "newnum call GBC...");
     gbc(ON, OFF); ec;
-    if((freenumtop + 1) > fromnumtop + (NUMSIZ / 2)) {
+    if((freenumtop + 1) >= fromnumtop + (NUMSIZ / 2)) {
       fprintf(stdout,"Allocation failed!!!!!!\n");
       exit(0);
     }
@@ -109,7 +110,7 @@ void gbc(int n, int a) {
       fprintf(stdout, "\nGBC surprised You,\n");
     }
   }
-  //Cellã¯æ¨™æº–ã§GCã®å¯¾è±¡ã§ã‚ã‚‹
+  //Cell‚Í•W€‚ÅGC‚Ì‘ÎÛ‚Å‚ ‚é
   initCellArea(tocelltop);
   freecelltop = tocelltop;
   if(n) {
@@ -127,28 +128,56 @@ void gbc(int n, int a) {
   }
   printf("Copying stack start**\n");
   for(sp1 = stacktop + 1; sp1 <= sp; ++sp1) {
+printf("sp before copying: %p: ", sp1);print_s(*sp1, ESCOFF);printf("\n");
     Copying(sp1, n, a);
+printf("sp after copying: %p: ", sp1);print_s(*sp1, ESCOFF);printf("\n");
   }
   gc_aux(n, a);
 
-  //fromcelltopã¨tocelltopã‚’äº¤æ›ã™ã‚‹(Defaultã§GCã®å¯¾è±¡ãªã®ã§)
+  //fromcelltop‚Ætocelltop‚ğŒğŠ·‚·‚é(Default‚ÅGC‚Ì‘ÎÛ‚È‚Ì‚Å)
   Celltmp = fromcelltop;
   fromcelltop = tocelltop;
   tocelltop = Celltmp;
   //TODO
-  //Fromé ˜åŸŸã®åˆæœŸåŒ–
+  //From—Ìˆæ‚Ì‰Šú‰»
   if(n) {
-    //fromnumtopã¨tonumtopã‚’äº¤æ›ã™ã‚‹
+    //fromnumtop‚Ætonumtop‚ğŒğŠ·‚·‚é
     Numtmp = fromnumtop;
     fromnumtop = tonumtop;
     tonumtop = Numtmp;
   }
   if(a) {
-    //fromatomtopã¨tocelltopã‚’äº¤æ›ã™ã‚‹
+    //fromatomtop‚Ætocelltop‚ğŒğŠ·‚·‚é
     Atomtmp = fromatomtop;
     fromatomtop = toatomtop;
     toatomtop = Atomtmp;
   }
+
+  // ‹Œ¢‘ã—Ìˆæ‚ÌACOPIEDƒtƒ‰ƒO‚ğ‰º‚ë‚·iCopy() –`“ª‚ÌƒRƒƒ“ƒgQÆj
+  {
+    ATOMP ap;
+     for(ap = old_freeatom; ap < old_freeatom + ATOMSIZ; ++ap)
+     {
+       ap->cpflag = NOTCOPIED;
+     }
+  }
+  {
+    CELLP cp;
+    for(cp = old_freecell; cp < old_freecell + CELLSIZ; ++cp)
+    {
+      cp->cpflag = NOTCOPIED;
+    }
+  }
+/* ¡‚Ì‚Æ‚±‚ënumber‚É‘Î‚µ‚Ä‚Í•s—v
+  {
+    NUMP np;
+     for(np = old_freenum; np < old_freenum + NUMSIZ; ++np)
+     {
+       np->cpflag = NOTCOPIED;
+     }
+  }
+*/
+
 }
 
 void initCellArea(CELLP from)
@@ -157,7 +186,9 @@ void initCellArea(CELLP from)
   printf("** Init Cell Area Start **\n");
   for(cp = from; cp < from + (CELLSIZ / 2); ++cp) {
     cp->id = _CELL;
+    cp->age = 0;
     cp->cpflag = NOTCOPIED;
+    cp->forwarding = (CELLP)nil;
     cp->car = (CELLP)nil;
     cp->cdr = (CELLP)nil;
   }
@@ -168,8 +199,8 @@ void initCellArea(CELLP from)
 void initAtomArea(ATOMP from)
 {
   ATOMP ap;
-  //atomã®é€£çµãƒªã‚¹ãƒˆã‚’ä½œæˆ
-  //nilã¯car,cdrã¨ã‚‚ã«è‡ªåˆ†è‡ªèº«ã‚’æŒ‡ã—ç¤ºã™ã®ã§atomã®å…ˆé ­ã«ã‚ã‚‹nilã¯ç„¡è¦–ã™ã‚‹(ã‚ˆã£ã¦+1ã‹ã‚‰å§‹ã‚ã‚‹)
+  //atom‚Ì˜AŒ‹ƒŠƒXƒg‚ğì¬
+  //nil‚Ícar,cdr‚Æ‚à‚É©•ª©g‚ğw‚µ¦‚·‚Ì‚Åatom‚Ìæ“ª‚É‚ ‚énil‚Í–³‹‚·‚é(‚æ‚Á‚Ä+1‚©‚çn‚ß‚é)
   printf("** Init Atom Area Start **\n");
   for(ap = from + 1; ap < from + (ATOMSIZ / 2); ++ap) {
     ap->id = _ATOM;
@@ -189,10 +220,11 @@ void initAtomArea(ATOMP from)
 void initNumArea(NUMP from)
 {
   NUMP np;
-  //numã®é€£çµãƒªã‚¹ãƒˆã‚’ä½œæˆ
+  //num‚Ì˜AŒ‹ƒŠƒXƒg‚ğì¬
   printf("** Init Num Area Start **\n");
   for(np = from; np < from + (NUMSIZ / 2); ++np) {
     np->id = _FIX;
+    np->age = 0;
     np->cpflag = NOTCOPIED;
     np->value.ptr = (NUMP)nil;
   }
@@ -201,19 +233,47 @@ void initNumArea(NUMP from)
 	
 void Copying(CELLP *top, int n, int a)
 {
-  //n = ONã®æ™‚ã¯numã‚‚Copyã™ã‚‹,
-  //a = ONã®æ™‚ã¯atom,strã‚‚Copyã™ã‚‹
+  //n = ON‚Ì‚Ínum‚àCopy‚·‚é,
+  //a = ON‚Ì‚Íatom,str‚àCopy‚·‚é
   *top = Copy(*top, n, a);
 }
 
 CELLP Copy(CELLP cp, int n, int a)
 {
-  //æ—§ä¸–ä»£é ˜åŸŸã«å±…ã‚‹ã‚„ã¤ã¯ç„¡è¦–ã™ã‚‹
-  if(ISOLDCELLP(cp) || ISOLDATOMP((ATOMP)cp) || ISOLDNUMP((NUMP)cp)) {//N//
+  //‹Œ¢‘ã—Ìˆæ‚É‹‚é‚â‚Âg©‘Ìh‚Í–³‹‚·‚é‚¯‚ÇA‚»‚±‚©‚çw‚³‚ê‚Ä‚¢‚é‚â‚Â‚Í–³‹‚µ‚¿‚á‚¾‚ß
+  // ˆê“xˆ—‚µ‚½‹Œ¢‘ã—Ìˆæ‚É‚¢‚é‚â‚Â‚É‚ÍCOPIEDƒtƒ‰ƒO‚ğ‚½‚Ä‚Ä‘½d‚Éˆ—‚µ‚Ä‚µ‚Ü‚¤‚±‚Æ‚ğ–h‚®
+  // —á	ƒAƒgƒ€f‚Ìfptr‚É (lambda (x) (... (f (plus x -1)) ...)) ‚ª‚Í‚¢‚Á‚Ä‚¢‚ÄAf‚ª‹Œ¢‘ã
+  //	—Ìˆæ‚É‚ ‚é‚Æ‚«Afptr‚ÌCopying‚Å‚Ó‚½‚½‚Ñf‚ğCopy‚·‚é‚±‚Æ‚É‚È‚é
+  // gbc() ‚ÌÅŒã‚ÉA‹Œ¢‘ã—Ìˆæ‚Ì‚·‚×‚Ä‚Ìcpflag‚©‚çCOPIEDƒtƒ‰ƒO‚ğ‰º‚ë‚·ˆ—‚ğ‰Á‚¦‚Ä‚¢‚é
+  if(ISOLDATOMP((ATOMP)cp))
+  {
+	if(! (cp->cpflag & COPIED))
+	{
+		cp->cpflag |= COPIED;
+		Copying(&(((ATOMP)cp)->plist), n, a);
+		Copying(&(((ATOMP)cp)->fptr), n, a);
+	}
+	return cp;
+  }
+  else if(ISOLDCELLP(cp))
+  {
+printf("‹Œ¢‘ã—ÌˆæƒZƒ‹(%p)", cp);
+	if(! (cp->cpflag & COPIED))
+	{
+printf("‚©‚ç‚Ì[‚¢GC");
+		cp->cpflag |= COPIED;
+		Copying(&(cp->car), n, a);
+		Copying(&(cp->cdr), n, a);
+	}
+printf("\n");
+	return cp;
+  }
+  else if(ISOLDNUMP((NUMP)cp)) // number‚©‚çw‚³‚ê‚é‚à‚Ì‚Í‚¢‚Ü‚Ì‚Æ‚±‚ë‚È‚¢
+  {
     return cp;
   }
   //char c = cp->id;//N//
-  //ã‚³ãƒ”ãƒ¼å…ˆã‚’è¡¨ã™ãƒã‚¤ãƒ³ã‚¿ãƒ¼
+  //ƒRƒs[æ‚ğ•\‚·ƒ|ƒCƒ“ƒ^[
   if(!(ISCELLP(cp) || ISATOMP((ATOMP)cp) || ISNUMP((NUMP)cp))) {//N//
     return cp;			
   }
@@ -235,52 +295,62 @@ CELLP Copy(CELLP cp, int n, int a)
 	}
       switch(c) {
       case _ATOM:
-	if(a) {
-	     if(cp->age >= syoushinn) {
-		  cp = promote((CELLP)cp);
-	     } else {
-		  cp->forwarding = memcpy(freeatomtop, cp, sizeof(ATOM));
-		  freeatomtop++;
-		  cp->cpflag |= COPIED;
-		  ((ATOMP)cp->forwarding)->value = Copy(((ATOMP)cp->forwarding)->value, n, a);
-		  ((ATOMP)cp->forwarding)->plist = Copy(((ATOMP)cp->forwarding)->plist, n, a); 
-		  if(!((((ATOMP)cp->forwarding)->ftype) & NONMRK)) {
-		       ((ATOMP)cp->forwarding)->fptr   = Copy(((ATOMP)cp->forwarding)->fptr, n, a);
-		  }
-	     }
-	     //ã‚³ãƒ”ãƒ¼ã—ãŸéš›ã¯ã‚³ãƒ”ãƒ¼å…ˆã®ã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’è¿”ã™
-	     return cp->forwarding;
-	}
-	else//N//
-	{//N//
-printf("p[%d] ", ((ATOMP)cp)->plist);
-		Copying(&(((ATOMP)cp)->plist), n, a);//N//
-printf("f[%d] ", ((ATOMP)cp)->fptr);
-		Copying(&(((ATOMP)cp)->fptr), n, a);//N//
-	}//N//
+	      if(a) {
+		      ATOMP to;
+		      cp->age++;
+		      if(cp->age >= syoushinn) {
+			      //cp = promote((CELLP)cp);
+			      to = (ATOMP)promote((CELLP)cp);//promote‚ÍƒRƒs[æ‚ÌƒAƒhƒŒƒX‚ğ•Ô‚·
+		      } else {
+			      to = freeatomtop++;
+		      }
+		      cp->forwarding = memcpy(to, cp, sizeof(ATOM));
+		      cp->cpflag |= COPIED;
+		      ((ATOMP)cp->forwarding)->value = Copy(((ATOMP)cp->forwarding)->value, n, a);
+		      ((ATOMP)cp->forwarding)->plist = Copy(((ATOMP)cp->forwarding)->plist, n, a); 
+		      if(!((((ATOMP)cp->forwarding)->ftype) & NONMRK)) {
+			      ((ATOMP)cp->forwarding)->fptr   = Copy(((ATOMP)cp->forwarding)->fptr, n, a);
+		      }
+		      //ƒRƒs[‚µ‚½Û‚ÍƒRƒs[æ‚ÌƒAƒhƒŒƒX‚ğ•Ô‚·
+		      return cp->forwarding;
+	      }
+	      else//N//
+	      {//N//
+		      printf("p[%d] ", ((ATOMP)cp)->plist);
+		      Copying(&(((ATOMP)cp)->plist), n, a);//N//
+		      printf("f[%d] ", ((ATOMP)cp)->fptr);
+		      Copying(&(((ATOMP)cp)->fptr), n, a);//N//
+	      }//N//
 	return cp;
       case _CELL:
+	{ CELLP to;
+	   cp->age++;
 	   if(cp->age >= syoushinn) {
-		cp = promote((CELLP)cp);
+//		cp = promote((CELLP)cp);
+		to = promote((CELLP)cp);//promote‚ÍƒRƒs[æ‚ÌƒAƒhƒŒƒX‚ğ•Ô‚·
 	   } else {
-		cp->forwarding = memcpy(freecelltop, cp, sizeof(CELL));
-		freecelltop++;
-		cp->cpflag |= COPIED;
-		cp->forwarding->car = Copy(cp->forwarding->car, n, a);
-		cp->forwarding->cdr = Copy(cp->forwarding->cdr, n, a);
+		to = freecelltop++;
 	   }
+	   cp->forwarding = memcpy(to, cp, sizeof(CELL));
+	   cp->cpflag |= COPIED;
+	   cp->forwarding->car = Copy(cp->forwarding->car, n, a);
+	   cp->forwarding->cdr = Copy(cp->forwarding->cdr, n, a);
 	   return cp->forwarding;
+	}
       case _FIX:
 	   //FALL THROUT
       case _FLT:
 	   if(n) {
+		NUMP to;
+		cp->age++;
 		if(cp->age >= syoushinn) {
-		     cp = promote(cp);
+		     //cp = promote(cp);
+		     to = (NUMP)promote(cp);//promote‚ÍƒRƒs[æ‚ÌƒAƒhƒŒƒX‚ğ•Ô‚·
 		} else {
-		     cp->forwarding = memcpy(freenumtop, cp, sizeof(NUM));
-		     freenumtop++;
-		     cp->cpflag |= COPIED;
+		     to = freenumtop++;
 		}
+		cp->forwarding = memcpy(to, cp, sizeof(NUM));
+		cp->cpflag |= COPIED;
 		return cp->forwarding;
 	   }
 	   return cp;
@@ -291,58 +361,111 @@ printf("f[%d] ", ((ATOMP)cp)->fptr);
   }
 }
 
-
+// ƒRƒs[æ‚ÌƒAƒhƒŒƒX‚ğ•Ô‚·‚¾‚¯
+// ƒRƒs[‚È‚Ç•K—v‚Èˆ—‚ÍŒÄ‚Ño‚µŒ³iCopy() ‘¤‚Ås‚¤j
 CELLP promote(CELLP cp) {
      char c = cp->id;//N//
-     //ã™ã§ã«æ—§ä¸–ä»£é ˜åŸŸã«å­˜åœ¨ã—ãŸã‚‰ä½•ã‚‚ã—ãªã„
+     //‚·‚Å‚É‹Œ¢‘ã—Ìˆæ‚É‘¶İ‚µ‚½‚ç‰½‚à‚µ‚È‚¢
      if(ISOLDCELLP(cp) || ISOLDATOMP((ATOMP)cp) || ISOLDNUMP((NUMP)cp)) {//N//
 	  return cp;
      }
-     //CELLã§ã‚‚ATOMã§ã‚‚NUMã§ã‚‚ç„¡ã„ç‰©ã¯ãƒãƒ¼ã‚¿ãƒƒãƒ
+     //CELL‚Å‚àATOM‚Å‚àNUM‚Å‚à–³‚¢•¨‚Íƒm[ƒ^ƒbƒ`
      if (!(ISCELLP(cp) || ISATOMP((ATOMP)cp) || ISNUMP((NUMP)cp))) {//N//
 	  return cp;
      }
-     //ãã‚Œä»¥å¤–ã¯æ—§ä¸–ä»£é ˜åŸŸã«ã‚³ãƒ”ãƒ¼ã—ãã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã™
-     //char c = cp->id;
+
+     //‚»‚êˆÈŠO‚Í‹Œ¢‘ã—Ìˆæ‚Ö‚ÌƒRƒs[æ‚ÌƒAƒhƒŒƒX‚ğ•Ô‚·
+  {  CELLP to;
      switch(c) {
      case _ATOM:
-	  if((old_freeatomtop + 1) > old_freeatom + ATOMSIZ) {
-	       //ã‚‚ã—æ—§ä¸–ä»£é ˜åŸŸãŒã„ã£ã±ã„ã ã£ãŸã‚‰
+	  if(old_freeatomtop == (ATOMP)nil) {
+	       //‚à‚µ‹Œ¢‘ã—Ìˆæ‚ª‚¢‚Á‚Ï‚¢‚¾‚Á‚½‚ç
 	       old_gbc(OFF,ON);
-	       if((old_freeatomtop + 1) > old_freeatom + ATOMSIZ) {
+	       if(old_freeatomtop == (ATOMP)nil) {
 		    fprintf(stdout,"Allocation failed!!!!!!\n");
 		    exit(0);
 	       }
 	  }
-	  cp->forwarding = memcpy(old_freeatomtop, cp, sizeof(ATOM));
-	  old_freeatomtop++;
-	  break;
+	  //Save old_freeatomtop
+	to = (CELLP)old_freeatomtop;
+	//Renew old_freeatomtop
+	old_freeatomtop = (ATOMP)old_freeatomtop->plist;
+	//Shallow copy
+//	*((ATOMP)tmp) = *((ATOMP)cp);
+/*
+	(ATOMP)tmp->id = (ATOMP)cp->id;
+	(ATOMP)tmp->age = (ATOMP)cp->age;
+	(ATOMP)tmp->cpflag = (ATOMP)cp->cpflag;
+	(ATOMP)tmp->forwarding = (ATOMP)cp->forwarding;
+	(ATOMP)tmp->value = (ATOMP)cp->value;
+	(ATOMP)tmp->plist = (ATOMP)cp->plist;
+	(ATOMP)tmp->name = (ATOMP)cp->name;
+	(ATOMP)tmp->ftype = (ATOMP)cp->ftype;
+	(ATOMP)tmp->fptr = (ATOMP)cp->fptr;
+*/
+//	cp->cpflag |= COPIED;
+//	cp->forwarding = tmp;
+	//old_freeatomtop++;
+	break;
      case _CELL:
-	  if((old_freecelltop + 1) > old_freecell + CELLSIZ) {
+	  if(old_freecelltop == (CELLP)nil) {
 	       old_gbc(OFF,ON);
-	       if((old_freecelltop + 1) > old_freecell + CELLSIZ) {
+	       if(old_freecelltop == (CELLP)nil) {
 		    fprintf(stdout,"Allocation failed!!!!!!\n");
 		    exit(0);
 	       }
 	  }
-	  cp->forwarding = memcpy(old_freecelltop, cp, sizeof(CELL));
-	  old_freecelltop++;
+	  //Save old_freeatomtop
+	  to = old_freecelltop;
+	  //Renew old_freeatomtop
+	  old_freecelltop = old_freecelltop->cdr;
+	  //Shallow copy
+//	  *tmp = *cp;
+/*
+	  tmp->id = cp->id;
+	  tmp->age = cp->age;
+	  tmp->cpflag = cp->cpflag;
+	  tmp->forwarding = cp->forwarding;
+	  tmp->car = cp->car;
+	  tmp->cdr = cp->cdr;
+*/
+//	  cp->cpflag |= COPIED;
+//	  cp->forwarding = tmp;
+//	  old_freecelltop++;
 	  break;
      case _FIX:
 	  //FALL THROUT
      case _FLT:
-	  if((old_freenumtop + 1) > old_freenum + CELLSIZ) {
+	  if(old_freenumtop == (NUMP)nil) {
 	       old_gbc(ON,OFF);
-	       if((old_freenumtop + 1) > old_freenum + CELLSIZ) {
+	       if(old_freenumtop == (NUMP)nil) {
 		    fprintf(stdout,"Allocation failed!!!!!!\n");
 		    exit(0);
 	       }
 	  }
-	  cp->forwarding = memcpy(old_freenumtop, cp, sizeof(NUM));
-	  old_freenumtop++;
+	  //Save old_freenumtop
+	  to = (CELLP)old_freenumtop;
+	  //Renew old_freenumtop
+	  old_freenumtop = old_freenumtop->value.ptr;
+	  //Shallow copy
+//	  *((NUMP)tmp) = *((NUMP)cp);
+/*
+	  (NUMP)tmp->id = (NUMP)cp->id;
+	  (NUMP)tmp->age = (NUMP)cp->age;
+	  (NUMP)tmp->cpflag = (NUMP)cp->cpflag;
+	  (NUMP)tmp->forwarding = (NUMP)cp->forwarding;
+	  (NUMP)tmp->value.ptr = (NUMP)cp->value.ptr;
+	  (NUMP)tmp->value.fix = (NUMP)cp->value.fix;
+	  (NUMP)tmp->value.flt = (NUMP)cp->value.flt;
+*/
+//	  cp->cpflag |= COPIED;
+//	  cp->forwarding = tmp;
+	  //old_freenumtop++;
 	  break;
      }
-     return cp;
+     //return cp;
+     return to;//ƒRƒs[æ‚ÌƒAƒhƒŒƒX‚ğ•Ô‚·
+  }
 }
 
 void old_gbc(int n, int a) {
@@ -357,12 +480,16 @@ void old_gbc(int n, int a) {
 	  }
      }
      for(i = 0; i < TABLESIZ; ++i) {
+	     fprintf(stdout, "\nMarking %d of oblist\n", i);
 	  mark(oblist[i], n);
      }
      for(sp1 = stacktop; sp1 <= sp; ++sp1) {
+	     fprintf(stdout, "\nMarking stack\n", i);
 	  mark(*sp1, n);
      }
+     fprintf(stdout, "Collectiong Cell Start\n");
      i = col_cell(); //ec;//N//
+     fprintf(stdout, "Collectiong Cell end\n");
      if(n) {
 	  n = col_num(); //ec;//N//
      }
@@ -387,15 +514,15 @@ void old_gbc(int n, int a) {
 
 void mark(CELLP cp, int n) {
 	char c = cp->id;
-	//æ—§ä¸–ä»£é ˜åŸŸã§ãªã„ç‰©ã‚‚å¯¾è±¡å¤–
+	//‹Œ¢‘ã—Ìˆæ‚Å‚È‚¢•¨‚à‘ÎÛŠO
 	if(!(ISOLDCELLP(cp) || ISOLDATOMP((ATOMP)cp) || ISOLDNUMP((NUMP)cp))) {//N//
 	     return;
 	}
-	//nilã‚‚ãƒãƒ¼ã‚¿ãƒƒãƒ
+	//nil‚àƒm[ƒ^ƒbƒ`
 	if(cp == (CELLP)nil) {
 		return;
 	}
-	//æ—¢ã«å‡¦ç†æ¸ˆã¿ã®ç‰©ã‚‚å¯¾è±¡å¤–
+	//Šù‚Éˆ—Ï‚İ‚Ì•¨‚à‘ÎÛŠO
 	if(c & USED) {
 		return;
 	}
@@ -441,7 +568,8 @@ void rem_mark_atom(void) {//N//
 int col_cell(void) //N//
 {
 	int n = 1;
-	CELLP end, cp = old_freecelltop;
+	CELLP end;
+	CELLP cp = old_freecelltop;
 	while(cp->id & USED) {
 		cp->id &= FREE;
 		if(++cp >= old_freecelltop + CELLSIZ) {
@@ -474,6 +602,7 @@ int col_num(void) {//N//
 			break;
 		}
 		np->id &=FREE;
+	fprintf(stdout, "Collectiong cell Start\n");
 		if(++np >= old_freenumtop + NUMSIZ) {
 			rem_mark_atom();
 			return (int)error(NUMUP);

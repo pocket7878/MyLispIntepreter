@@ -13,6 +13,7 @@ void print_s(CELLP cp, int mode) {
 		pri_atom(cp, mode);
 	}
 	else {
+fprintf(cur_fpo, "[%p]", cp);
 		fputc('(', cur_fpo);
 		forever{
 			print_s(cp->car, mode);
@@ -21,6 +22,7 @@ void print_s(CELLP cp, int mode) {
 				break;
 			}
 			fputc(' ', cur_fpo);
+fprintf(cur_fpo, "cdr[%p]", cp);
 		}
 		if(cp != (CELLP)nil) {
 			fprintf(cur_fpo, " . ");

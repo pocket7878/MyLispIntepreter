@@ -15,7 +15,7 @@ CELLP eval(CELLP form, CELLP env)
      static char tabs[100];
      CELLP cp, apply(), atomvalue(), evallist();
      ATOMP func;
-     tabs[e] = '\t';
+     tabs[e] = ' ';
      tabs[++e] = '\0';
      printf("\n%s%d: form=", tabs, e);
      print_s(form, ESCON);
@@ -34,8 +34,8 @@ CELLP eval(CELLP form, CELLP env)
 	  return form;
      case _CELL:
 	  stackcheck;
-	  //ã‚¹ã‚¿ãƒƒã‚¯ãƒã‚¤ãƒ³ã‚¿ã‚’é€²ã‚ã‚‹
-	  ++sp;
+	  //ƒXƒ^ƒbƒNƒ|ƒCƒ“ƒ^‚ði‚ß‚é
+	  *++sp = (CELLP)nil;
 	  func = (ATOMP)form->car;
 	  {//N//
 	    int q = on(&form);
@@ -43,7 +43,7 @@ CELLP eval(CELLP form, CELLP env)
 	    //on(sp);//N//
 	    on((CELLP*)&func);//N//
 	    if(eval_arg_p(func)) {
-	         //ã‚¹ã‚¿ãƒƒã‚¯ã«å¼•ãæ•°ã‚’è©•ä¾¡ã—ãŸçµæžœã‚’ä¿å­˜ã™ã‚‹(ã“ã®ãƒãƒƒã‚¯ã‚°ãƒ©ã‚¦ãƒ³ãƒ‰ã§spã¯--ã•ã‚Œã¦ã„ã‚‹)
+	         //ƒXƒ^ƒbƒN‚Éˆø‚«”‚ð•]‰¿‚µ‚½Œ‹‰Ê‚ð•Û‘¶‚·‚é(‚±‚ÌƒoƒbƒNƒOƒ‰ƒEƒ“ƒh‚Åsp‚Í--‚³‚ê‚Ä‚¢‚é)
 	         *sp = evallist(form->cdr, env);
 	         //off(q);//N//
 	         if(err){//N//
@@ -138,7 +138,7 @@ static CELLP apply(CELLP func, CELLP args, CELLP env)
 	       bodies = func->cdr->cdr;
 	       stackcheck;
 				
-	       //lambda-argsã®å¼•ãæ•°ã®ãã‚Œãžã‚Œã«argsã®å€¤ã‚’bindã™ã‚‹ã‚ˆ :-)!!
+	       //lambda-args‚Ìˆø‚«”‚Ì‚»‚ê‚¼‚ê‚Éargs‚Ì’l‚ðbind‚·‚é‚æ :-)!!
 	       q = on(&args);//N//
 	       on(&env);
 	       on(&func);
@@ -167,54 +167,78 @@ static CELLP evallist(CELLP args, CELLP env)
 {
      int q;
      CELLP cp1, newcell(), eval();
-     //å¼•ãæ•°ã®ãƒªã‚¹ãƒˆãŒcellã§ãªã„å ´åˆã¯ãŠãã‚‰ãnilãªã®ã§nilã‚’è¿”å´ã™ã‚‹
+     //ˆø‚«”‚ÌƒŠƒXƒg‚ªcell‚Å‚È‚¢ê‡‚Í‚¨‚»‚ç‚­nil‚È‚Ì‚Ånil‚ð•Ô‹p‚·‚é
      if(args->id != _CELL) {
 	  return (CELLP)nil;
      }
      stackcheck;
      q = on(&args);
      on(&env);
-     //stackã«æ–°ã—ã„cellã‚’ç”¨æ„ã™ã‚‹
+     //stack‚ÉV‚µ‚¢cell‚ð—pˆÓ‚·‚é
      *++sp = newcell();//N//
      off(q);//N//
 	     ec;//N//
-     //ç¾åœ¨ã®ã‚¹ã‚¿ãƒƒã‚¯ãƒã‚¤ãƒ³ã‚¿ã‚’ä¸€æ—¦ä¿å­˜ã—ã¦ãŠã
+     //Œ»Ý‚ÌƒXƒ^ƒbƒNƒ|ƒCƒ“ƒ^‚ðˆê’U•Û‘¶‚µ‚Ä‚¨‚­
      cp1 = *sp;
-     //ä¿å­˜ã—ãŸcellã®carã«å¼•ãæ•°ã®ä¸€ã¤ç›®ã‚’è©•ä¾¡ã—ãŸç‰©ã‚’å…¥ã‚Œã‚‹
-     q = on(&cp1); //CP1ã‚’è¿½åŠ ä¿è­·
+     //•Û‘¶‚µ‚½cell‚Ìcar‚Éˆø‚«”‚Ìˆê‚Â–Ú‚ð•]‰¿‚µ‚½•¨‚ð“ü‚ê‚é
+     q = on(&cp1); //CP1‚ð’Ç‰Á•ÛŒì
      on(&args);
      on(&env);
      cp1->car = eval(args->car, env);//N//
      off(q);//N//
 	     ec;//N//
-     //æ¬¡ã®å¼•ãæ•°ã«ç§»ã‚‹
+     //ŽŸ‚Ìˆø‚«”‚ÉˆÚ‚é
+printf("\n***(*sp)‚Í%p”Ô’n‚É‘¶Ý‚µA“à—e‚Í%p‚Å‚ ‚éB‚»‚±‚É‚Í", sp, *sp);print_s(*sp,ESCOFF);printf("‚ª‚ ‚éB");
+
      args = args->cdr;
-     //å¼•ãæ•°ãŒcellåž‹ã§ã‚ã‚‹é™ã‚Šã€å‡¦ç†ã‚’é€²ã‚ã‚‹
+     //ˆø‚«”‚ªcellŒ^‚Å‚ ‚éŒÀ‚èAˆ—‚ði‚ß‚é
      while(args->id == _CELL) {
 	  q = on(&env);
 	  on(&args);
 	  on(&cp1);
-	  //ä¿å­˜ã—ãŸcellã®cdrã«æ–°ã—ã„cellã‚’ç¢ºä¿ã™ã‚‹
+	  //•Û‘¶‚µ‚½cell‚Ìcdr‚ÉV‚µ‚¢cell‚ðŠm•Û‚·‚é
+printf("\n***2‚Â–ÚˆÈ~‚Ìˆø”‚Ì‚½‚ß‚Énewcell()‚ðŒÄ‚Ño‚µcp1i*sp1‚Æ“¯‚¶j‚Ìcdr‚É‚Â‚È‚®B");
 	  cp1->cdr = newcell();//N//
+printf("\n***(*sp)‚Í%p”Ô’n‚É‘¶Ý‚µA“à—e‚Í%p‚Å‚ ‚éB‚»‚±‚É‚Í", sp, *sp);print_s(*sp,ESCOFF);printf("‚ª‚ ‚éB");
+
+printf("\n***cp1‚Í%p”Ô’n‚É‘¶Ý‚µA“à—e‚Í%p‚Å‚ ‚éB‚»‚±‚É‚Í", &cp1, cp1);print_s(cp1,ESCOFF);printf("‚ª‚ ‚éB");
+
 	  off(q);//N//
 	     ec;//N//
-	  //ä¿å­˜ã—ãŸcellã®cdrã«è©•ä¾¡çµæžœã‚’å…¥ã‚Œã‚‹
+	  //•Û‘¶‚µ‚½cell‚Ìcdr‚É•]‰¿Œ‹‰Ê‚ð“ü‚ê‚é
 	  cp1 = cp1->cdr;
 	  q = on(&env);
 	  on(&args);
 	  on(&cp1);
-	  cp1->car = eval(args->car, env);//N//
+printf("\n***cp1‚Í%p”Ô’n‚É‘¶Ý‚µA“à—e‚Í%p‚Å‚ ‚éB‚»‚±‚É‚Í", &cp1, cp1);print_s(cp1,ESCOFF);printf("‚ª‚ ‚éB");
+
+printf("\n***args‚Í%p”Ô’n‚É‘¶Ý‚µA“à—e‚Í%p‚Å‚ ‚éB‚»‚±‚É‚Í", &args, args);print_s(args,ESCOFF);printf("‚ª‚ ‚éB");
+printf("\n***env‚Í%p”Ô’n‚É‘¶Ý‚µA“à—e‚Í%p‚Å‚ ‚éB‚»‚±‚É‚Í", &env, env);print_s(env,ESCOFF);printf("‚ª‚ ‚éB");
+printf("\n***args->car‚ðenv‚Ì‚à‚Æ‚Åeval‚µ‚½‚Æ‚±‚ëA‚»‚ÌŒ‹‰Êtmp‚Íc");
+	  {
+	  CELLP tmp = eval(args->car, env);
+printf("\n***eval‚µ‚½Œ‹‰Êtmp‚Í%p”Ô’n‚É‘¶Ý‚µA“à—e‚Í%p‚Å‚ ‚éB‚»‚±‚É‚Í", &tmp, tmp);print_s(tmp,ESCOFF);printf("‚ª‚ ‚éB");
+printf("\n***eval‚ðŒo‚ÄAcp1AargsAenv‚Íc");
+printf("\n***cp1‚Í%p”Ô’n‚É‘¶Ý‚µA“à—e‚Í%p‚Å‚ ‚éB‚»‚±‚É‚Í", &cp1, cp1);print_s(cp1,ESCOFF);printf("‚ª‚ ‚éB");
+printf("\n***args‚Í%p”Ô’n‚É‘¶Ý‚µA“à—e‚Í%p‚Å‚ ‚éB‚»‚±‚É‚Í", &args, args);print_s(args,ESCOFF);printf("‚ª‚ ‚éB");
+printf("\n***env‚Í%p”Ô’n‚É‘¶Ý‚µA“à—e‚Í%p‚Å‚ ‚éB‚»‚±‚É‚Í", &env, env);print_s(env,ESCOFF);printf("‚ª‚ ‚éB");
+	  cp1->car = tmp;
+printf("\n***cp1->car‚Étmp‚ð‘ã“ü‚µ‚Äc");
+printf("\n***cp1‚Í%p”Ô’n‚É‘¶Ý‚µA“à—e‚Í%p‚Å‚ ‚éB‚»‚±‚É‚Í", &cp1, cp1);print_s(cp1,ESCOFF);printf("‚ª‚ ‚éB");
+printf("\n***(*sp)‚Í%p”Ô’n‚É‘¶Ý‚µA“à—e‚Í%p‚Å‚ ‚éB‚»‚±‚É‚Í", sp, *sp);print_s(*sp,ESCOFF);printf("‚ª‚ ‚éB");
+
+	  }//N//
 	  off(q);//N//
 	     ec;//N//
 	  args = args->cdr;
      }
-     //ã“ã‚Œã‚’æŠœã‘ãŸè¾žå…¸ã§ã‚¹ã‚¿ãƒƒã‚¯ã«ã¯ã™ã¹ã¦ã®å¼•ãæ•°ã®è©•ä¾¡çµæžœãŒå…¥ã£ã¦ã„ã‚‹ãã—ã¦nilã§ã—ã‚ã‚‹ã€‚
+     //‚±‚ê‚ð”²‚¯‚½Ž«“T‚ÅƒXƒ^ƒbƒN‚É‚Í‚·‚×‚Ä‚Ìˆø‚«”‚Ì•]‰¿Œ‹‰Ê‚ª“ü‚Á‚Ä‚¢‚é‚»‚µ‚Änil‚Å‚µ‚ß‚éB
      cp1->cdr = (CELLP)nil;
-     //ã‚¹ã‚¿ãƒƒã‚¯ãƒã‚¤ãƒ³ã‚¿ã‚’è¿”ã—ã€ãã®å¾Œspã‚’ä¸€ã¤æ¸›ã‚‰ã™
+     //ƒXƒ^ƒbƒNƒ|ƒCƒ“ƒ^‚ð•Ô‚µA‚»‚ÌŒãsp‚ðˆê‚ÂŒ¸‚ç‚·
      return *sp--;
 }
 
-//keysã®ãã‚Œãžã‚Œã«valuesã®ãã‚Œãžã‚Œã®å€¤ã‚’bindã™ã‚‹ã‚ˆï¼ï¼
+//keys‚Ì‚»‚ê‚¼‚ê‚Évalues‚Ì‚»‚ê‚¼‚ê‚Ì’l‚ðbind‚·‚é‚æII
 CELLP bind(CELLP keys, CELLP values, CELLP env)
 {
      CELLP push();
@@ -228,7 +252,7 @@ CELLP bind(CELLP keys, CELLP values, CELLP env)
      //q = on(&env);//N//
      //on(&keys);//N//
      //on(&values);//N//
-     //keysãŒãŒnilã§ãªãã‹ã¤ã€keysãŒatomãªã‚‰
+     //keys‚ª‚ªnil‚Å‚È‚­‚©‚ÂAkeys‚ªatom‚È‚ç
      if(keys != (CELLP)nil && keys->id == _ATOM) {
 	  q = on(&env);//N//
 	  on(&keys);//N//

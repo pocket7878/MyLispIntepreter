@@ -119,7 +119,7 @@ typedef NUM *NUMP;
 #define COPIED 0x01
 #define FREE (~USED)
 #define STACKSIZ 0x0500
-#define stackcheck if(sp>=stacktop+STACKSIZ){error(STACKUP);return(NULL);}
+#define stackcheck if(sp>=stacktop+STACKSIZ){error(STACKUP);puts("###StackOverFlow###");exit(1);return(NULL);}
 #define STACKUP 28
 #define SYSATOMS 30
 

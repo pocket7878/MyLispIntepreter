@@ -190,6 +190,19 @@ static void init(void)//N//
 	  printf("Please change --SIZ (defined in lisp.h).\n");
 	  exit(1);
      }
+printf("fromcelltop=%p\n", fromcelltop);
+printf("tocelltop=%p\n", tocelltop);
+printf("fromatomtop=%p\n", fromatomtop);
+printf("toatomtop=%p\n", toatomtop);
+printf("fromnumtop=%p\n", fromnumtop);
+printf("tonumtop=%p\n", tonumtop);
+printf("fromstrtop=%p\n", fromstrtop);
+printf("tostrtop=%p\n", tostrtop);
+printf("old_freecell=%p\n", old_freecell);
+printf("old_freeatom=%p\n", old_freeatom);
+printf("old_freenum=%p\n", old_freenum);
+printf("old_freestr=%p\n", old_freestr);
+
      refreshCellArea(fromcelltop, tocelltop);
      refreshAtomArea(fromatomtop, toatomtop);
      refreshNumArea(fromnumtop, tonumtop);
@@ -208,6 +221,7 @@ void refreshCellArea(CELLP from, CELLP to)
      //Cellの連結リストを作成
      for(cp = fromcelltop; cp < fromcelltop + (CELLSIZ / 2); ++cp) {
 	  cp->id = _CELL;
+	  cp->age = 0;
 	  cp->forwarding = (CELLP)nil;
 	  cp->car = (CELLP)nil;
 	  cp->cdr = (CELLP)nil;
@@ -216,6 +230,7 @@ void refreshCellArea(CELLP from, CELLP to)
      (--cp)->cdr = (CELLP)nil;
      for(cp = tocelltop; cp < tocelltop + (CELLSIZ / 2); ++cp) {
 	  cp->id = _CELL;
+	  cp->age = 0;
 	  cp->forwarding = (CELLP)nil;
 	  cp->car = (CELLP)nil;
 	  cp->cdr = (CELLP)nil;
@@ -223,9 +238,10 @@ void refreshCellArea(CELLP from, CELLP to)
      (--cp)->cdr = (CELLP)nil;
      for(cp = old_freecelltop; cp < old_freecelltop + CELLSIZ; ++cp) {
 	  cp->id = _CELL;
+	  cp->age = 0;
 	  cp->forwarding = (CELLP)nil;
 	  cp->car = (CELLP)nil;
-	  cp->cdr = (CELLP)nil;
+	  cp->cdr = cp + 1;
      }
      //最後尾をnilにする
      (--cp)->cdr = (CELLP)nil;
@@ -269,7 +285,7 @@ void refreshAtomArea(ATOMP from, ATOMP to)
 	  ap->cpflag = NOTCOPIED;
 	  ap->forwarding = (CELLP)nil;//N//
 	  ap->value = (CELLP)nil;//N//
-	  ap->plist = (CELLP)nil;
+	  ap->plist = (CELLP)(ap + 1);
 	  ap->name = "";//N//
 	  ap->ftype = 0;//N//
 	  ap->fptr = (CELLP)nil;//N//
@@ -294,6 +310,7 @@ void refreshNumArea(NUMP from, NUMP to)
      //numの連結リストを作成
      for(np = fromnumtop; np < fromnumtop + (NUMSIZ / 2); ++np) {
 	  np->id = _FIX;
+	  np->age = 0;
 	  np->forwarding = (CELLP)nil;//N//
 	  np->value.ptr = (NUMP)nil;
      }
@@ -301,6 +318,7 @@ void refreshNumArea(NUMP from, NUMP to)
      (--np)->value.ptr = (NUMP)nil;
      for(np = tonumtop; np < tonumtop + (NUMSIZ / 2); ++np) {
 	  np->id = _FIX;
+	  np->age = 0;
 	  np->forwarding = (CELLP)nil;//N//
 	  np->value.ptr = (NUMP)nil;
      }	
@@ -308,8 +326,9 @@ void refreshNumArea(NUMP from, NUMP to)
      (--np)->value.ptr = (NUMP)nil;
      for(np = old_freenumtop; np < old_freenumtop + NUMSIZ; ++np) {
 	  np->id = _FIX;
+	  np->age = 0;
 	  np->forwarding = (CELLP)nil;//N//
-	  np->value.ptr = (NUMP)nil;//N//
+	  np->value.ptr = np + 1;
      }
      (--np)->value.ptr = (NUMP)nil;//N//
 }	
