@@ -4,11 +4,17 @@
 
 static void init0(void);//N//
 static void init1(void);//N//
+static void init2(void);
+static void init3(void);
+
 static void defsubr(STR name,CELLP (*funcp)(),char type);//N//
+
 void inisubr(void)//N//
 {
 	init0();
 	init1();
+	init2();
+	init3();
 }
 
 static void init0(void)//N//
@@ -51,6 +57,34 @@ static void init1(void)//N//
 	CELLP reclaim_f(), verbos_f();
 	defsubr("reclaim", reclaim_f, _SUBR);
 	defsubr("verbos", verbos_f, _SUBR);
+}
+
+static void init2(void)
+{
+	CELLP progn_f(), throw_f(), catch_f();
+	CELLP catch_f(), let_f(), lets_f();
+	CELLP prog_f(), ret_f(), go_f();
+
+	defsubr("progn", progn_f, _FSUBR);
+	defsubr("throw", throw_f, _FSUBR);
+	defsubr("catch", catch_f, _FSUBR);
+	defsubr("catcherror", catch_f, _FSUBR);
+	defsubr("let", let_f, _FSUBR);
+	defsubr("let*", lets_f, _FSUBR);
+	defsubr("prog", prog_f, _FSUBR);
+	defsubr("return", ret_f, _SUBR);
+	defsubr("go", go_f, _FSUBR);
+}	
+
+static void init3(void)
+{
+	CELLP eval_f(), rplacd_f(), lessp_f(), and_f(), or_f();
+
+	defsubr("eval", eval_f, _FSUBR);
+	defsubr("rplacd", rplacd_f, _SUBR);
+	defsubr("lessp", lessp_f, _SUBR);
+	defsubr("and", and_f, _FSUBR);
+	defsubr("or", or_f, _FSUBR);
 }
 
 static void defsubr(STR name,CELLP (*funcp)(),char type)//N//

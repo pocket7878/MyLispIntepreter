@@ -9,11 +9,12 @@
 static void putstr(int mode, STR tp);//N//
 
 void print_s(CELLP cp, int mode) {
+//printf("[print_s: id=%x]", (int)cp->id);
 	if(cp->id != _CELL) {
 		pri_atom(cp, mode);
 	}
 	else {
-fprintf(cur_fpo, "[%p]", cp);
+//fprintf(cur_fpo, "[%p]", cp);
 		fputc('(', cur_fpo);
 		forever{
 			print_s(cp->car, mode);
@@ -22,7 +23,7 @@ fprintf(cur_fpo, "[%p]", cp);
 				break;
 			}
 			fputc(' ', cur_fpo);
-fprintf(cur_fpo, "cdr[%p]", cp);
+//fprintf(cur_fpo, "cdr[%p]", cp);
 		}
 		if(cp != (CELLP)nil) {
 			fprintf(cur_fpo, " . ");
@@ -43,6 +44,8 @@ void pri_atom(CELLP cp, int mode) {
 			break;
 		case _ATOM:
 			putstr(mode, ((ATOMP)cp)->name);
+//printf("fptr(%p):", ((ATOMP)cp)->fptr);
+//if(((ATOMP)cp)->ftype == _EXPR) print_s(((ATOMP)cp)->fptr->car, ESCOFF);
 			break;
 		default:
 			error(ULO);

@@ -27,6 +27,10 @@ extern int verbos;
 
 extern int threshold;
 
-extern ATOMP freesysatomtop, freesysatoms;
+//extern ATOMP freesysatomtop, freesysatoms;
+extern ATOMP freesysatomtop, freesysatom;	// !!!N
 extern int save_in_sys_atom;
+
+extern CELLP throwlabel, throwval;
+
 #endif

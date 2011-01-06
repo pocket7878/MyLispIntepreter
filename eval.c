@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "lisp.h"
 #include "error.h"//N//
 #include "gbc.h"//N//
@@ -11,16 +12,18 @@ static CELLP atomvalue(ATOMP ap, CELLP env);
 
 CELLP eval(CELLP form, CELLP env)
 {
-     static int e = 0;
-     static char tabs[100];
+//static int e = 0;
+//static char tabs[100];
      CELLP cp, apply(), atomvalue(), evallist();
      ATOMP func;
-     tabs[e] = ' ';
-     tabs[++e] = '\0';
-     printf("\n%s%d: form=", tabs, e);
-     print_s(form, ESCON);
-     printf(", env=");
-     print_s(env, ESCON);
+//tabs[e] = ' ';
+//tabs[++e] = '\0';
+//printf("\n%s%d: form=", tabs, e);
+//print_s(form, ESCON);
+//printf("\n");
+//printf(", env=");
+//print_s(env, ESCON);
+//printf("\n");
 
      switch(form->id) {
      case _ATOM:
@@ -28,9 +31,10 @@ CELLP eval(CELLP form, CELLP env)
 	  break;
      case _FIX:
      case _FLT:
-	  printf("\n%s%d: result=(NUM)", tabs, e);
-	  print_s(form,ESCON);
-	  tabs[--e] = '\0';
+//printf("\n%s%d: result=(NUM)", tabs, e);
+//print_s(form,ESCON);
+//printf("\n");
+//tabs[--e] = '\0';
 	  return form;
      case _CELL:
 	  stackcheck;
@@ -54,30 +58,30 @@ CELLP eval(CELLP form, CELLP env)
 	    else {
 	         *sp = form->cdr;
 	    }
-	    printf("\nEVAL: Current *SP is ");
-	    print_s(*sp, ESCON);
-	    printf("\n");
+//	    printf("\nEVAL: Current *SP is ");
+//	    print_s(*sp, ESCON);
+//	    printf("\n");
 	    cp = apply((CELLP)func, *sp, env);
 	    off(q);
 	  }//N//
 	  sp--;
 	  break;
      default:
-	  printf("\n%s%d: result=EORROR", tabs, e);
-	  tabs[--e] = '\0';
+//printf("\n%s%d: result=EORROR", tabs, e);
+//tabs[--e] = '\0';
 	  error(ULO);
 
      }
      if(err == ERR) {
 	  pri_err(form);
-	  printf("\n%s%d: result=EORROR", tabs, e);
-	  tabs[--e] = '\0';
+//printf("\n%s%d: result=EORROR", tabs, e);
+//tabs[--e] = '\0';
 	  return NULL;
      }
-     printf("\n%s%d: result=", tabs, e);
-     print_s(cp, ESCON);
-     tabs[--e] = '\0';
-     if(e == 0) printf("\n");
+//printf("\n%s%d: result=", tabs, e);
+//print_s(cp, ESCON);
+//tabs[--e] = '\0';
+//if(e == 0) printf("\n");
      return cp;
 }
 
@@ -103,9 +107,9 @@ static CELLP apply(CELLP func, CELLP args, CELLP env)
      CELLP bind(CELLP keys, CELLP values, CELLP env);//N//
      char funtype;
 
-     printf("\nAPPLY: Current args: \n");//N//
-     print_s(args, ESCON);//N//
-     printf("\n");//N//
+   //  printf("\nAPPLY: Current args: \n");//N//
+    // print_s(args, ESCON);//N//
+     //printf("\n");//N//
 
      //function check
      switch(func->id) {
@@ -188,7 +192,7 @@ static CELLP evallist(CELLP args, CELLP env)
      off(q);//N//
 	     ec;//N//
      //次の引き数に移る
-printf("\n***(*sp)は%p番地に存在し、内容は%pである。そこには", sp, *sp);print_s(*sp,ESCOFF);printf("がある。");
+//printf("\n***(*sp)は%p番地に存在し、内容は%pである。そこには", sp, *sp);print_s(*sp,ESCOFF);printf("がある。");
 
      args = args->cdr;
      //引き数がcell型である限り、処理を進める
@@ -197,11 +201,11 @@ printf("\n***(*sp)は%p番地に存在し、内容は%pである。そこには", sp, *sp);print_s(
 	  on(&args);
 	  on(&cp1);
 	  //保存したcellのcdrに新しいcellを確保する
-printf("\n***2つ目以降の引数のためにnewcell()を呼び出しcp1（*sp1と同じ）のcdrにつなぐ。");
+//printf("\n***2つ目以降の引数のためにnewcell()を呼び出しcp1（*sp1と同じ）のcdrにつなぐ。");
 	  cp1->cdr = newcell();//N//
-printf("\n***(*sp)は%p番地に存在し、内容は%pである。そこには", sp, *sp);print_s(*sp,ESCOFF);printf("がある。");
+//printf("\n***(*sp)は%p番地に存在し、内容は%pである。そこには", sp, *sp);print_s(*sp,ESCOFF);printf("がある。");
 
-printf("\n***cp1は%p番地に存在し、内容は%pである。そこには", &cp1, cp1);print_s(cp1,ESCOFF);printf("がある。");
+//printf("\n***cp1は%p番地に存在し、内容は%pである。そこには", &cp1, cp1);print_s(cp1,ESCOFF);printf("がある。");
 
 	  off(q);//N//
 	     ec;//N//
@@ -210,22 +214,22 @@ printf("\n***cp1は%p番地に存在し、内容は%pである。そこには", &cp1, cp1);print_s(
 	  q = on(&env);
 	  on(&args);
 	  on(&cp1);
-printf("\n***cp1は%p番地に存在し、内容は%pである。そこには", &cp1, cp1);print_s(cp1,ESCOFF);printf("がある。");
+//printf("\n***cp1は%p番地に存在し、内容は%pである。そこには", &cp1, cp1);print_s(cp1,ESCOFF);printf("がある。");
 
-printf("\n***argsは%p番地に存在し、内容は%pである。そこには", &args, args);print_s(args,ESCOFF);printf("がある。");
-printf("\n***envは%p番地に存在し、内容は%pである。そこには", &env, env);print_s(env,ESCOFF);printf("がある。");
-printf("\n***args->carをenvのもとでevalしたところ、その結果tmpは…");
+//printf("\n***argsは%p番地に存在し、内容は%pである。そこには", &args, args);print_s(args,ESCOFF);printf("がある。");
+//printf("\n***envは%p番地に存在し、内容は%pである。そこには", &env, env);print_s(env,ESCOFF);printf("がある。");
+//printf("\n***args->carをenvのもとでevalしたところ、その結果tmpは…");
 	  {
 	  CELLP tmp = eval(args->car, env);
-printf("\n***evalした結果tmpは%p番地に存在し、内容は%pである。そこには", &tmp, tmp);print_s(tmp,ESCOFF);printf("がある。");
-printf("\n***evalを経て、cp1、args、envは…");
-printf("\n***cp1は%p番地に存在し、内容は%pである。そこには", &cp1, cp1);print_s(cp1,ESCOFF);printf("がある。");
-printf("\n***argsは%p番地に存在し、内容は%pである。そこには", &args, args);print_s(args,ESCOFF);printf("がある。");
-printf("\n***envは%p番地に存在し、内容は%pである。そこには", &env, env);print_s(env,ESCOFF);printf("がある。");
+//printf("\n***evalした結果tmpは%p番地に存在し、内容は%pである。そこには", &tmp, tmp);print_s(tmp,ESCOFF);printf("がある。");
+//printf("\n***evalを経て、cp1、args、envは…");
+//printf("\n***cp1は%p番地に存在し、内容は%pである。そこには", &cp1, cp1);print_s(cp1,ESCOFF);printf("がある。");
+//printf("\n***argsは%p番地に存在し、内容は%pである。そこには", &args, args);print_s(args,ESCOFF);printf("がある。");
+//printf("\n***envは%p番地に存在し、内容は%pである。そこには", &env, env);print_s(env,ESCOFF);printf("がある。");
 	  cp1->car = tmp;
-printf("\n***cp1->carにtmpを代入して…");
-printf("\n***cp1は%p番地に存在し、内容は%pである。そこには", &cp1, cp1);print_s(cp1,ESCOFF);printf("がある。");
-printf("\n***(*sp)は%p番地に存在し、内容は%pである。そこには", sp, *sp);print_s(*sp,ESCOFF);printf("がある。");
+//printf("\n***cp1->carにtmpを代入して…");
+//printf("\n***cp1は%p番地に存在し、内容は%pである。そこには", &cp1, cp1);print_s(cp1,ESCOFF);printf("がある。");
+//printf("\n***(*sp)は%p番地に存在し、内容は%pである。そこには", sp, *sp);print_s(*sp,ESCOFF);printf("がある。");
 
 	  }//N//
 	  off(q);//N//
@@ -243,12 +247,12 @@ CELLP bind(CELLP keys, CELLP values, CELLP env)
 {
      CELLP push();
      int q;//N//
-     printf("\nBIND: Current keys");
-     print_s(keys,ESCON);
-     printf("\n");
-     printf("\nBIND: Current values");
-     print_s(values,ESCON);
-     printf("\n");
+ //    printf("\nBIND: Current keys");
+     //print_s(keys,ESCON);
+     //printf("\n");
+  //   printf("\nBIND: Current values");
+     //print_s(values,ESCON);
+     //printf("\n");
      //q = on(&env);//N//
      //on(&keys);//N//
      //on(&values);//N//
@@ -293,12 +297,12 @@ static CELLP push(CELLP keys, CELLP value, CELLP env)
 {
      int q;
      CELLP newcell();
-     printf("\nPUSH: Current Value is: ");
-     print_s(value, ESCOFF);
-     printf("\n");
-     printf("\nPUSH: Current *SP is: ");
-     print_s(*sp, ESCOFF);
-     printf("\n");
+//     printf("\nPUSH: Current Value is: ");
+     //print_s(value, ESCOFF);
+     //printf("\n");
+//     printf("\nPUSH: Current *SP is: ");
+     //print_s(*sp, ESCOFF);
+     //printf("\n");
      stackcheck;
      q = on(&env);
      on(&keys);

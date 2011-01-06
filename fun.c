@@ -236,6 +236,7 @@ static void defsubr(STR name, CELLP (*funcp)(), char type)//N//
 	ap->fptr = (CELLP)funcp;
 }
 
+/*
 void ini_subr()//N//
 {
 	CELLP car_f(),   cdr_f(),    cons_f();
@@ -270,4 +271,4 @@ void ini_subr()//N//
 	defsubr("minus", minus_f,	_SUBR);
 	defsubr("plus", plus_f,	_SUBR);
 }
-
+*/

@@ -39,7 +39,12 @@ static STR err_msg[] = {
 	"Unexpected EOF",
 	"Can't Change Constant value",
 	"Undentified error",
-	"Software stack used up"
+	"Software stack used up",
+	"No such go-label",
+	"Return without Prog",
+	"Throw Tag must be an Atom",
+	"Throw without Catch",
+	"Illegal Local Variable List"
 };
 
 CELLP error(int code)

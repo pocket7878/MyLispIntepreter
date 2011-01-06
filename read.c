@@ -27,9 +27,16 @@ int iskanji2(uchar c);
 
 static STR getstr()
 {
+//printf("%d ", __LINE__);
 	if(isatty(fileno(cur_fpi)))
+	{
+//printf("%d ", __LINE__);
 		print_s((CELLP)prompt, ESCOFF);
+//printf("%d ", __LINE__);
+	}
+//printf("%d ", __LINE__);
 	*(txtp = oneline) = '\0';
+//printf("%d ", __LINE__);
 	return fgets(oneline, LINESIZ, cur_fpi);
 }
 static void getname(STR strp)
