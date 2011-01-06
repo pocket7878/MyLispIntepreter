@@ -73,9 +73,9 @@ int toplevel_f(void)//N//
 //	  on(argp1);
 //	  on(argp2);
 //print_s(((ATOMP)((*argp1)->car))->fptr, ESCOFF);
-print_s((*argp1)->car, ESCOFF);
-printf("[%p]",(ATOMP)((*argp1)->car));
-if(ISCELLP(((ATOMP)((*argp1)->car))->fptr)) print_s(((ATOMP)((*argp1)->car))->fptr, ESCOFF);
+//print_s((*argp1)->car, ESCOFF);
+//printf("[%p]",(ATOMP)((*argp1)->car));
+//if(ISCELLP(((ATOMP)((*argp1)->car))->fptr)) print_s(((ATOMP)((*argp1)->car))->fptr, ESCOFF);
 	  *argp2 = eval(*argp1, *argp2);
 //	  off(q);
 	  //エラーが有れば出力し、復帰する
@@ -83,6 +83,12 @@ if(ISCELLP(((ATOMP)((*argp1)->car))->fptr)) print_s(((ATOMP)((*argp1)->car))->fp
 	  case ERROK:
 	  case ERR:
 	       return (int)(err = ERROK);
+	  case THROW:
+	       return (int)error(TWC);
+	  case GO:
+	       return (int)error(NSG);
+	  case RET:
+	       return (int)error(RWP);
 	  }
 	  //結果を出力
 	  print_s(*argp2, ESCON);
@@ -117,6 +123,7 @@ static void reset_err(void)//N//
      }
      sp = stacktop - 1;
      verbos = ON;
+     throwlabel = throwval = (CELLP)nil;
 }
 
 static void init(void)//N// 
@@ -211,7 +218,8 @@ printf("old_freestr=%p\n", old_freestr);
 	  oblist[i] = (CELLP)nil;
      }
      mk_sys_atoms();
-     ini_subr();
+//     ini_subr();
+     inisubr();
      signal(SIGINT, quit);
 }
 

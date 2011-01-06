@@ -114,14 +114,24 @@ typedef NUM *NUMP;
 #define UNDEF	27
 
 #define NONMRK (_UD | _SR)
-#define USED 0x80
-#define NOTCOPIED 0x00
-#define COPIED 0x01
+#define USED 0x80u
+#define NOTCOPIED 0x00u
+#define COPIED 0x01u
 #define FREE (~USED)
 #define STACKSIZ 0x0500
 #define stackcheck if(sp>=stacktop+STACKSIZ){error(STACKUP);puts("###StackOverFlow###");exit(1);return(NULL);}
 #define STACKUP 28
 #define SYSATOMS 30
+
+#define THROW 2
+#define GO 3
+#define RET 4
+
+#define NSG 29
+#define RWP 30
+#define TTA 31
+#define TWC 32
+#define ILV 33
 
 #ifdef MAIN
 #include "defvar.h"

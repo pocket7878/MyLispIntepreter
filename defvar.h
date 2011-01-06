@@ -28,4 +28,6 @@ int verbos;
 
 ATOMP freesysatomtop, freesysatom;
 int save_in_sys_atom;
+
+CELLP throwlabel, throwval;
 #endif
