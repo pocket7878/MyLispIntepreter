@@ -44,7 +44,8 @@ static STR err_msg[] = {
 	"Return without Prog",
 	"Throw Tag must be an Atom",
 	"Throw without Catch",
-	"Illegal Local Variable List"
+	"Illegal Local Variable List",
+	"Division by Zero"
 };
 
 CELLP error(int code)

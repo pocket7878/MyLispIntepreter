@@ -30,6 +30,7 @@ CELLP cond_f(CELLP clauses, CELLP env)
 			     q = on(&env);
 			     on(&clauses);
 			     on(&bodies);
+				on(&key);
 			     result = eval(bodies->car, env); ec;
 			     off(q);
 			     bodies = bodies->cdr;
@@ -154,6 +155,7 @@ CELLP oblist_f(void) {//N//
 }
 
 CELLP quit_f(void) {//N//
+	printf("CG times: %d\n",gc_time);
 	exit(0);
 	return 0;//N//•K—v‚È‚¢‚ªŒx‚ğ‚Â‚Ô‚·‚½‚ß
 }

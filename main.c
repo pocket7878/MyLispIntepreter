@@ -142,15 +142,21 @@ static void init(void)//N//
       *
       *************************************/
      //cell/2の連続領域を確保
+C1 = 
      fromcelltop = (CELLP)malloc(sizeof(CELL) * (CELLSIZ / 2));
+C2 = 
      tocelltop = (CELLP)malloc(sizeof(CELL) * (CELLSIZ / 2));
      freecelltop = fromcelltop;	
      ///以下同様
+A1 = 
      fromatomtop = (ATOMP)malloc(sizeof(ATOM) * (ATOMSIZ / 2));
+A2 = 
      toatomtop = (ATOMP)malloc(sizeof(ATOM) * (ATOMSIZ / 2));
      freeatomtop = fromatomtop;
 	
+N1 = 
      fromnumtop  = (NUMP)malloc(sizeof(NUM) * (NUMSIZ / 2));
+N2 = 
      tonumtop = (NUMP)malloc(sizeof(NUM) * (NUMSIZ / 2));
      freenumtop = fromnumtop;
 	
@@ -158,12 +164,13 @@ static void init(void)//N//
      tostrtop = (STR)malloc(STRSIZ / 2);
      freestrtop = fromstrtop;
 	
+     gc_time = 0;
      /*************************************
       *
       *   旧世代領域
       *
       *************************************/
-     //cell/2の連続領域を確保
+//     //cell/2の連続領域を確保
      old_freecell = (CELLP)malloc(sizeof(CELL) * (CELLSIZ));
      old_freecelltop = old_freecell;	
      ///以下同様

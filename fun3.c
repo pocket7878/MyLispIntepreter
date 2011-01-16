@@ -6,6 +6,7 @@
 #include "print.h"
 
 CELLP eval_f(CELLP args, CELLP env);
+CELLP apply_f(CELLP args, CELLP env);
 CELLP rplacd_f(CELLP args);
 CELLP lessp_f(CELLP args);
 CELLP and_f(CELLP args, CELLP env);
@@ -22,6 +23,19 @@ CELLP eval_f(CELLP args, CELLP env)
 	local_env = append_f(args->cdr->car, env);
 	on(&local_env);
 	result = eval(eval(args->car, local_env), local_env);
+	off(q);
+	return result;
+}
+
+// (apply func arg1 ... argn)
+CELLP apply_f(CELLP args, CELLP env)
+{
+	CELLP local_env, result, func, params;
+	int q = on(&args);
+	on(&env);
+	func = eval(args->car, env);
+	on(&func);
+	result = eval(cons(func, args->cdr), env);
 	off(q);
 	return result;
 }

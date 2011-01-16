@@ -16,7 +16,11 @@ NUMP  old_freenum,old_freenumtop;
 STR   fromstrtop, tostrtop, newstr,freestrtop;
 STR   old_freestr, old_freestrtop;
 
-CELLP* cellpp[999];
+CELLP C1, C2;
+ATOMP A1, A2;
+NUMP N1, N2;
+
+CELLP* cellpp[CELLPPSIZ];
 int cellpptop;
 
 uchar oneline[LINESIZ];
@@ -30,4 +34,6 @@ ATOMP freesysatomtop, freesysatom;
 int save_in_sys_atom;
 
 CELLP throwlabel, throwval;
+
+int gc_time;
 #endif

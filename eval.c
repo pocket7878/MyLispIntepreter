@@ -5,8 +5,8 @@
 #include "print.h"//N//
 #include "save.h"
 static int eval_arg_p(ATOMP func);
-static CELLP apply(CELLP func, CELLP args, CELLP env);
-static CELLP evallist(CELLP args, CELLP env);
+CELLP apply(CELLP func, CELLP args, CELLP env);
+CELLP evallist(CELLP args, CELLP env);
 static CELLP push(CELLP keys, CELLP value, CELLP env);
 static CELLP atomvalue(ATOMP ap, CELLP env);
 
@@ -19,12 +19,14 @@ CELLP eval(CELLP form, CELLP env)
 //tabs[e] = ' ';
 //tabs[++e] = '\0';
 //printf("\n%s%d: form=", tabs, e);
+//printf("省略");
 //print_s(form, ESCON);
 //printf("\n");
+//if(e>150){
 //printf(", env=");
 //print_s(env, ESCON);
 //printf("\n");
-
+//}
      switch(form->id) {
      case _ATOM:
 	  cp = atomvalue((ATOMP)form, env);
@@ -37,31 +39,42 @@ CELLP eval(CELLP form, CELLP env)
 //tabs[--e] = '\0';
 	  return form;
      case _CELL:
-	  stackcheck;
+//	  stackcheck;
 	  //スタックポインタを進める
-	  *++sp = (CELLP)nil;
+	  *++sp = (CELLP)nil;	stackcheck;
+//printf("=%d= ", __LINE__);
 	  func = (ATOMP)form->car;
+//printf("=%d= ", __LINE__);
 	  {//N//
 	    int q = on(&form);
 	    on(&env);
 	    //on(sp);//N//
 	    on((CELLP*)&func);//N//
+//printf("=%d= ", __LINE__);
 	    if(eval_arg_p(func)) {
 	         //スタックに引き数を評価した結果を保存する(このバックグラウンドでspは--されている)
+//printf("eval form=");
+//print_s(form, ESCOFF);
+//printf("=%d= ", __LINE__);
 	         *sp = evallist(form->cdr, env);
+//printf("=%d= ", __LINE__);
 	         //off(q);//N//
 	         if(err){//N//
 	           off(q);//N//
+//printf("=%d= ", __LINE__);
 	           break;//N//
 	         }//N//
 	    }
 	    else {
+//printf("=%d= ", __LINE__);
 	         *sp = form->cdr;
 	    }
 //	    printf("\nEVAL: Current *SP is ");
 //	    print_s(*sp, ESCON);
 //	    printf("\n");
+//printf("=%d= ", __LINE__);
 	    cp = apply((CELLP)func, *sp, env);
+//printf("=%d= ", __LINE__);
 	    off(q);
 	  }//N//
 	  sp--;
@@ -79,9 +92,11 @@ CELLP eval(CELLP form, CELLP env)
 	  return NULL;
      }
 //printf("\n%s%d: result=", tabs, e);
+//printf("省略");
 //print_s(cp, ESCON);
 //tabs[--e] = '\0';
 //if(e == 0) printf("\n");
+//printf("=%d= ", __LINE__);
      return cp;
 }
 
@@ -97,7 +112,7 @@ static int eval_arg_p(ATOMP func)
 }
 
 //function, args, environment!!
-static CELLP apply(CELLP func, CELLP args, CELLP env)
+CELLP apply(CELLP func, CELLP args, CELLP env)
 {
      //printf("\nAPPLY: Current args: \n");//N//
      //print_s(args, ESCON);//N//
@@ -107,6 +122,13 @@ static CELLP apply(CELLP func, CELLP args, CELLP env)
      CELLP bind(CELLP keys, CELLP values, CELLP env);//N//
      char funtype;
 
+//printf("=%d= ", __LINE__);
+//printf("apply func=");
+//print_s(func, ESCOFF);
+//printf(" args=");
+//print_s(args, ESCOFF);
+//printf(" env=");
+//print_s(env, ESCOFF);
    //  printf("\nAPPLY: Current args: \n");//N//
     // print_s(args, ESCON);//N//
      //printf("\n");//N//
@@ -114,25 +136,35 @@ static CELLP apply(CELLP func, CELLP args, CELLP env)
      //function check
      switch(func->id) {
      case _ATOM:
+//printf("=%d= ", __LINE__);
 	  //if func is atom => maybe just func
 	  funtype = ((ATOMP)func)->ftype;
 	  if(funtype & _UD) {
+//printf("=%d= ", __LINE__);
 	       return error(UDF);
 	  }
 	  if(funtype & _SR) {
+//printf("=%d= ", __LINE__);
 	       funcp = (CELLP (*)())((ATOMP)func)->fptr;
 	       if(funtype & _EA) {
+//printf("=%d= ", __LINE__);
 		    return (*(CELLP(*)(CELLP))funcp)(args);//N//
 	       }
 	       else {
+//printf("=%d= ", __LINE__);
 		    return (*(CELLP(*)(CELLP,CELLP))funcp)(args, env);//N//
 	       }
 	  }
 	  func = ((ATOMP)func)->fptr;
+//printf("=%d= ", __LINE__);
      case _CELL:
+//printf("=%d= ", __LINE__);
+//printf("func=");
+//print_s(func, ESCOFF);
 	  //if func is cell => maybe lambda
 	  //(lambda (x) <- this must be cell
 	  if(func->cdr->id != _CELL) {
+//printf("=%d= ", __LINE__);
 	       return error(IFF);
 	  }
 	  //(lambda <- check!!
@@ -160,18 +192,22 @@ static CELLP apply(CELLP func, CELLP args, CELLP env)
 			    ec;//N//
 	       }
 	       sp--;
+//printf("=%d= ", __LINE__);
 	       return result;
 	  }
      default:
+//printf("=%d= ", __LINE__);
 	  return error(IFF);
      }
 }
 
-static CELLP evallist(CELLP args, CELLP env)
+CELLP evallist(CELLP args, CELLP env)
 {
      int q;
      CELLP cp1, newcell(), eval();
      //引き数のリストがcellでない場合はおそらくnilなのでnilを返却する
+//printf("evallist args=");
+//print_s(args, ESCOFF);
      if(args->id != _CELL) {
 	  return (CELLP)nil;
      }
@@ -179,7 +215,9 @@ static CELLP evallist(CELLP args, CELLP env)
      q = on(&args);
      on(&env);
      //stackに新しいcellを用意する
+//printf("=%d= ", __LINE__);
      *++sp = newcell();//N//
+//printf("=%d= ", __LINE__);
      off(q);//N//
 	     ec;//N//
      //現在のスタックポインタを一旦保存しておく
@@ -188,7 +226,9 @@ static CELLP evallist(CELLP args, CELLP env)
      q = on(&cp1); //CP1を追加保護
      on(&args);
      on(&env);
+//printf("=%d= ", __LINE__);
      cp1->car = eval(args->car, env);//N//
+//printf("=%d= ", __LINE__);
      off(q);//N//
 	     ec;//N//
      //次の引き数に移る
@@ -196,21 +236,30 @@ static CELLP evallist(CELLP args, CELLP env)
 
      args = args->cdr;
      //引き数がcell型である限り、処理を進める
+//printf("=%d= ", __LINE__);
      while(args->id == _CELL) {
+//printf("=%d= ", __LINE__);
 	  q = on(&env);
 	  on(&args);
 	  on(&cp1);
 	  //保存したcellのcdrに新しいcellを確保する
 //printf("\n***2つ目以降の引数のためにnewcell()を呼び出しcp1（*sp1と同じ）のcdrにつなぐ。");
+//printf("=%d= ", __LINE__);
 	  cp1->cdr = newcell();//N//
+//printf("=%d= ", __LINE__);
+//print_s(args, ESCOFF);
 //printf("\n***(*sp)は%p番地に存在し、内容は%pである。そこには", sp, *sp);print_s(*sp,ESCOFF);printf("がある。");
 
 //printf("\n***cp1は%p番地に存在し、内容は%pである。そこには", &cp1, cp1);print_s(cp1,ESCOFF);printf("がある。");
 
 	  off(q);//N//
+//printf("=%d= ", __LINE__);
 	     ec;//N//
+//printf("=%d= ", __LINE__);
 	  //保存したcellのcdrに評価結果を入れる
+//printf("=%d= ", __LINE__);
 	  cp1 = cp1->cdr;
+//printf("=%d= ", __LINE__);
 	  q = on(&env);
 	  on(&args);
 	  on(&cp1);
@@ -219,8 +268,10 @@ static CELLP evallist(CELLP args, CELLP env)
 //printf("\n***argsは%p番地に存在し、内容は%pである。そこには", &args, args);print_s(args,ESCOFF);printf("がある。");
 //printf("\n***envは%p番地に存在し、内容は%pである。そこには", &env, env);print_s(env,ESCOFF);printf("がある。");
 //printf("\n***args->carをenvのもとでevalしたところ、その結果tmpは…");
+//printf("=%d= ", __LINE__);
 	  {
 	  CELLP tmp = eval(args->car, env);
+//printf("=%d= ", __LINE__);
 //printf("\n***evalした結果tmpは%p番地に存在し、内容は%pである。そこには", &tmp, tmp);print_s(tmp,ESCOFF);printf("がある。");
 //printf("\n***evalを経て、cp1、args、envは…");
 //printf("\n***cp1は%p番地に存在し、内容は%pである。そこには", &cp1, cp1);print_s(cp1,ESCOFF);printf("がある。");
@@ -233,12 +284,17 @@ static CELLP evallist(CELLP args, CELLP env)
 
 	  }//N//
 	  off(q);//N//
+//printf("=%d= ", __LINE__);
 	     ec;//N//
+//printf("=%d= ", __LINE__);
 	  args = args->cdr;
+//printf("=%d= ", __LINE__);
      }
      //これを抜けた辞典でスタックにはすべての引き数の評価結果が入っているそしてnilでしめる。
+//printf("=%d= ", __LINE__);
      cp1->cdr = (CELLP)nil;
      //スタックポインタを返し、その後spを一つ減らす
+//printf("=%d= ", __LINE__);
      return *sp--;
 }
 
@@ -307,7 +363,9 @@ static CELLP push(CELLP keys, CELLP value, CELLP env)
      q = on(&env);
      on(&keys);
      on(&value);
+//printf("=%d= ", __LINE__);
      *++sp = newcell();//N//
+//printf("=%d= ", __LINE__);
      off(q);//N//
 	  ec;//N//
      (*sp)->cdr = env;
@@ -315,7 +373,9 @@ static CELLP push(CELLP keys, CELLP value, CELLP env)
      q = on(&env);
      on(&keys);
      on(&value);
+//printf("=%d= ", __LINE__);
      env->car = newcell();//N//
+//printf("=%d= ", __LINE__);
      off(q);//N//
 	  ec;//N//
      env->car->car = keys;

@@ -127,3 +127,207 @@ CELLP plus_f(CELLP args){
 	}
 //	off(q);//N//
 }
+
+CELLP times_f(CELLP args){
+	CELLP setfirst(), get1arg();
+	NUM val;
+	NUMP np;
+	int q = on(&args);
+	//args->cdrとnpには最初の値がかえってくる
+	args = setfirst(args, &np); ec;
+	off(q);
+	//引数が一つの場合はその引数を返却する
+	if(args == (CELLP)nil) {
+		return (CELLP)np;
+	}
+	//引数が複数個ある場合は
+	//args->cdr, val = args->cdr->car
+	q = on(&args);
+	on((CELLP*)&np);//N//
+	args = get1arg(args, &val); ec;
+	off(q);
+	//npに足していく	
+	if(np->id == _FIX) {
+		while(val.id == _FIX) {
+			//npに足していく
+			np->value.fix *= val.value.fix;
+			//引数が尽きたら、npをかえす
+			if(args == (CELLP)nil) {
+				return (CELLP)np;
+			}
+			//update args
+			q = on(&args);
+			on((CELLP*)&np);//N//
+			args = get1arg(args, &val); ec;
+			off(q);
+		}
+		toflt(np);
+	}
+	//if np->id == _FLT then;
+	else {
+		toflt(&val);
+	}
+	forever {
+		np->value.flt *= val.value.flt;
+		if (args == (CELLP)nil) {
+			return (CELLP)np;
+		}
+		q = on(&args);//N//
+		on((CELLP*)&np);//N//
+		args = get1arg(args, &val); ec;
+		off(q);//N//
+		toflt(&val);
+	}
+//	off(q);//N//
+}
+
+CELLP difference_f(CELLP args){
+	CELLP setfirst(), get1arg();
+	NUM val;
+	NUMP np;
+	int q = on(&args);
+	//args->cdrとnpには最初の値がかえってくる
+	args = setfirst(args, &np); ec;
+	off(q);
+	//引数が一つの場合はその引数を返却する
+	if(args == (CELLP)nil) {
+		return (CELLP)np;
+	}
+	//引数が複数個ある場合は
+	//args->cdr, val = args->cdr->car
+	q = on(&args);
+	on((CELLP*)&np);//N//
+	args = get1arg(args, &val); ec;
+	off(q);
+	//npに足していく	
+	if(np->id == _FIX) {
+		while(val.id == _FIX) {
+			//npに足していく
+			np->value.fix -= val.value.fix;
+			//引数が尽きたら、npをかえす
+			if(args == (CELLP)nil) {
+				return (CELLP)np;
+			}
+			//update args
+			q = on(&args);
+			on((CELLP*)&np);//N//
+			args = get1arg(args, &val); ec;
+			off(q);
+		}
+		toflt(np);
+	}
+	//if np->id == _FLT then;
+	else {
+		toflt(&val);
+	}
+	forever {
+		np->value.flt -= val.value.flt;
+		if (args == (CELLP)nil) {
+			return (CELLP)np;
+		}
+		q = on(&args);//N//
+		on((CELLP*)&np);//N//
+		args = get1arg(args, &val); ec;
+		off(q);//N//
+		toflt(&val);
+	}
+//	off(q);//N//
+}
+
+CELLP quotient_f(CELLP args){
+	CELLP setfirst(), get1arg();
+	NUM val;
+	NUMP np;
+	int q = on(&args);
+	//args->cdrとnpには最初の値がかえってくる
+	args = setfirst(args, &np); ec;
+	off(q);
+	//引数が一つの場合はその引数を返却する
+	if(args == (CELLP)nil) {
+		return (CELLP)np;
+	}
+	//引数が複数個ある場合は
+	//args->cdr, val = args->cdr->car
+	q = on(&args);
+	on((CELLP*)&np);//N//
+	args = get1arg(args, &val); ec;
+	off(q);
+	//npに足していく	
+	if(np->id == _FIX) {
+		while(val.id == _FIX) {
+			if(val.value.fix == 0) {
+				return (CELLP)error(DIVZERO);
+			}
+			//npに足していく
+			np->value.fix /= val.value.fix;
+			//引数が尽きたら、npをかえす
+			if(args == (CELLP)nil) {
+				return (CELLP)np;
+			}
+			//update args
+			q = on(&args);
+			on((CELLP*)&np);//N//
+			args = get1arg(args, &val); ec;
+			off(q);
+		}
+		toflt(np);
+	}
+	//if np->id == _FLT then;
+	else {
+		toflt(&val);
+	}
+	forever {
+		if(val.value.flt == 0) {
+				return (CELLP)error(DIVZERO);
+		}
+		np->value.flt /= val.value.flt;
+		if (args == (CELLP)nil) {
+			return (CELLP)np;
+		}
+		q = on(&args);//N//
+		on((CELLP*)&np);//N//
+		args = get1arg(args, &val); ec;
+		off(q);//N//
+		toflt(&val);
+	}
+//	off(q);//N//
+}
+
+
+CELLP remainder_f(CELLP args){
+	CELLP setfirst(), get1arg();
+	NUM val;
+	NUMP np;
+	int q = on(&args);
+	//args->cdrとnpには最初の値がかえってくる
+	args = setfirst(args, &np); ec;
+	off(q);
+	//引数が一つの場合はその引数を返却する
+	if(args == (CELLP)nil) {
+		return (CELLP)np;
+	}
+	//引数が複数個ある場合は
+	//args->cdr, val = args->cdr->car
+	q = on(&args);
+	on((CELLP*)&np);//N//
+	args = get1arg(args, &val); ec;
+	off(q);
+	//npに足していく	
+	if(np->id == _FIX) {
+		while(val.id == _FIX) {
+			//npに足していく
+			np->value.fix %= val.value.fix;
+			//引数が尽きたら、npをかえす
+			if(args == (CELLP)nil) {
+				return (CELLP)np;
+			}
+			//update args
+			q = on(&args);
+			on((CELLP*)&np);//N//
+			args = get1arg(args, &val); ec;
+			off(q);
+		}
+		toflt(np);
+	}
+	return (CELLP)error(IAF);
+}

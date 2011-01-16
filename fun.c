@@ -82,6 +82,17 @@ CELLP atom_f(CELLP args)
 	return (CELLP)nil;
 }
 
+CELLP numberp_f(CELLP args)
+{
+	if(args->id != _CELL) {
+		return (CELLP)error(NEA);
+	}
+	if(args->car->id == _FIX || args->car->id == _FLT) {
+		return (CELLP)t;
+	}
+	return (CELLP)nil;
+}
+
 CELLP equal_f(CELLP args) 
 {
 	int equal();
@@ -166,6 +177,7 @@ CELLP putprop_f(CELLP args)
 	q = on(&args);//N//
 	on(&val);//N//
 	on(&cp);//N//
+	on((CELLP *)&key);
 	on((CELLP*)&ap);//N//
 	*++sp = newcell(); ec;
 	cp = *sp;
@@ -200,6 +212,21 @@ CELLP get_f(CELLP args)
 	return (CELLP)nil;
 }
 
+CELLP intern_f(CELLP arg)
+{
+  STR str = arg->car; // こんなふうにできる？
+  ATOMP ap;
+  print_s(str,ESCON);
+  if((ap = old_atom(str)) == NULL)
+  {
+    int q = on(&arg);
+    ap = mk_atom(str);
+    off(q);
+  }
+  return (CELLP)ap;
+}
+
+
 CELLP remprop_f(CELLP args)
 {
 	CELLP val, cp;
@@ -228,6 +255,44 @@ CELLP remprop_f(CELLP args)
 	}
 	return (CELLP)nil;
 }
+
+CELLP generate_atom_f(CELLP arg)
+{
+  ATOMP result;
+  uchar name[NAMLEN + 1];
+  int i;
+  CELLP cp;
+  char id;
+  for(i = 0, cp = arg->car; cp != (CELLP)nil; ++i, cp = cp->cdr)
+  {
+		//とりあえずATOMとして確保しておく
+    ATOMP ap = (ATOMP)(cp->car);
+    id = cp->car->id;
+
+    if(i >= NAMLEN)
+    {
+      return (CELLP)nil; // 長すぎるError
+    }
+    //でもやっぱりFIXでしたという場合は
+    if(id == _FIX) {
+	name[i] = ((NUMP)(cp->car))->value.fix + 48;
+    }
+    //ちゃんとATOMであった場合は
+    else if(id == _ATOM) {
+	name[i] = ap->name[0];
+    }	
+    else if(id != _ATOM)
+    {
+      return (CELLP)nil; // アトムか数値だけにしてくれError
+    }
+  }
+  name[i] = NULL;
+  if((result = old_atom(name)) == NULL) {
+    return (CELLP)mk_atom(name);
+  }
+  return (CELLP)result;
+}
+
 static void defsubr(STR name, CELLP (*funcp)(), char type)//N//
 {
 	ATOMP ap, mk_atom();

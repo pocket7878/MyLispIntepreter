@@ -60,10 +60,10 @@ typedef NUM *NUMP;
 #define _SR	0x02
 #define _EA	0x04
 
-#define CELLSIZ	5000
-#define	ATOMSIZ	500
-#define STRSIZ	3000
-#define	NUMSIZ	30
+#define CELLSIZ	60000
+#define	ATOMSIZ	10000
+#define STRSIZ	30000
+#define	NUMSIZ	10000
 #define	TABLESIZ	64
 #define LINESIZ	100
 #define NAMLEN	100
@@ -118,7 +118,7 @@ typedef NUM *NUMP;
 #define NOTCOPIED 0x00u
 #define COPIED 0x01u
 #define FREE (~USED)
-#define STACKSIZ 0x0500
+#define STACKSIZ 0x10000
 #define stackcheck if(sp>=stacktop+STACKSIZ){error(STACKUP);puts("###StackOverFlow###");exit(1);return(NULL);}
 #define STACKUP 28
 #define SYSATOMS 30
@@ -132,6 +132,9 @@ typedef NUM *NUMP;
 #define TTA 31
 #define TWC 32
 #define ILV 33
+#define DIVZERO 34
+
+#define CELLPPSIZ 0x40000
 
 #ifdef MAIN
 #include "defvar.h"

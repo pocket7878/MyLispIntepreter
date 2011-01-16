@@ -16,7 +16,11 @@ extern NUMP old_freenum,old_freenumtop;
 extern STR fromstrtop, tostrtop, newstr,freestrtop;
 extern STR old_newstr,old_freestrtop;
 
-extern CELLP* cellpp[999];
+extern CELLP C1, C2;
+extern ATOMP A1, A2;
+extern NUMP N1, N2;
+
+extern CELLP* cellpp[CELLPPSIZ];
 extern int cellpptop;
 
 extern uchar oneline[LINESIZ];
@@ -32,5 +36,5 @@ extern ATOMP freesysatomtop, freesysatom;	// !!!N
 extern int save_in_sys_atom;
 
 extern CELLP throwlabel, throwval;
-
+extern int gc_time;
 #endif
